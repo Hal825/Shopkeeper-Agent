@@ -1,0 +1,25 @@
+[project]
+name = "shopkeeper-agent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "asyncmy>=0.2.11",
+    "cryptography>=48.0.0",
+    "elasticsearch[async]>=8,<9",
+    "fastapi[standard]>=0.136.1",
+    "greenlet>=3.5.0",
+    "huggingface-hub>=1.15.0",
+    "jieba>=0.42.1",
+    "langchain>=1.3.1",
+    "langchain-deepseek>=1.0.1",
+    "langchain-huggingface>=1.2.2",
+    "langgraph>=1.2.0",
+    "loguru>=0.7.3",
+    "omegaconf>=2.3.0",
+    "python-dotenv>=1.2.2",
+    "pyyaml>=6.0.3",
+    "qdrant-client>=1.18.0",
+    "sqlalchemy>=2.0.49",
+]

@@ -1,0 +1,44 @@
+logging:
+  file:
+    enable: true
+    level: INFO
+    path: logs
+    rotation: "10 MB"
+    retention: "7 days"
+  console:
+    enable: true
+    level: INFO
+
+db_meta:
+  host: localhost
+  port: 3306
+  user: didilili
+  password: dili123
+  database: meta
+
+db_dw:
+  host: localhost
+  port: 3306
+  user: didilili
+  password: dili123
+  database: dw
+
+qdrant:
+  host: localhost
+  port: 6333
+  embedding_size: 1792
+
+embedding:
+  host: localhost
+  port: 8081
+  model: Qwen/Qwen3-Embedding-0.6B
+
+es:
+  host: localhost
+  port: 9200
+  index_name: data_agent
+
+llm:
+  model_name: deepseek-v4-pro
+  api_key: ${DEEPSEEK_API_KEY}
+  base_url: https://api.deepseek.com
