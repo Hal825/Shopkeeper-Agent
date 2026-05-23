@@ -12,26 +12,26 @@ logging:
 db_meta:
   host: localhost
   port: 3306
-  user: didilili
-  password: dili123
+  user: lzs
+  password: lzs666
   database: meta
 
 db_dw:
   host: localhost
   port: 3306
-  user: didilili
-  password: dili123
+  user: lzs
+  password: lzs666
   database: dw
 
 qdrant:
   host: localhost
   port: 6333
-  embedding_size: 1792
+  embedding_size: 512
 
 embedding:
   host: localhost
   port: 8081
-  model: Qwen/Qwen3-Embedding-0.6B
+  model: BAAI/bge-small-zh-v1.5
 
 es:
   host: localhost

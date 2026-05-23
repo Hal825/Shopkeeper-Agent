@@ -39,7 +39,7 @@ services:
       - elasticsearch
 
   qdrant:
-    image: qdrant/qdrant:v1.16
+    image: qdrant/qdrant:v1.18.0
     container_name: qdrant
     restart: unless-stopped
     ports:
@@ -56,11 +56,11 @@ services:
     ports:
       - "8081:80"
     environment:
-      MODEL_ID: /models/qwen3-embedding-0.6b
+      MODEL_ID: /models/bge-small-zh
       MAX_CONCURRENT_REQUESTS: "16"
       MAX_BATCH_TOKENS: "16384"
     volumes:
-      - ./embedding/qwen3-embedding-0.6b:/models/qwen3-embedding-0.6b
+      - ./embedding/bge-small-zh:/models/bge-small-zh
 
 volumes:
   mysql_data:
