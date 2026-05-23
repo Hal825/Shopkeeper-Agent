@@ -69,7 +69,9 @@ class AppConfig:
 
 
 # ====================== 配置加载（修改部分） ======================
-config_file = Path(__file__).resolve().parent / "app_config.yaml"
+# 修改：配置文件在项目根目录的 conf 文件夹下
+# 从当前文件位置（app/conf/app_config.py）向上两级到项目根目录，然后进入 conf
+config_file = Path(__file__).resolve().parents[2] / "conf" / "app_config.yaml"
 
 # 先读取 YAML 文件原始内容
 with open(config_file, "r", encoding="utf-8") as f:
@@ -80,11 +82,13 @@ def replace_env_var(match):
     var_name = match.group(1)
     return os.environ.get(var_name, f"${{{var_name}}}")  # 没找到就保留原样
 
-raw_yaml = re.sub(r'\$\{(\w+)\}', replace_env_var, raw_yaml)
+raw_yaml = re.sub(r'\$\{(\w+)}', replace_env_var, raw_yaml)
 
 # 再用 OmegaConf 加载替换后的内容
 context = OmegaConf.create(raw_yaml)
 
+
+#app_config.py 是"表格模板"（定义结构），app_config.yaml 是"填好的表格"（存储数据）。两者合并后，才能得到可用的配置对象->合并后的对象就是 app_config
 # 生成 schema 并合并
 schema = OmegaConf.structured(AppConfig)
 app_config: AppConfig = OmegaConf.to_object(OmegaConf.merge(schema, context)) #内容+结构
