@@ -21,10 +21,6 @@ class EmbeddingClientManager:
         # 在应用启动阶段显式调用，完成真正的客户端初始化
         # self.client = HuggingFaceEndpointEmbeddings(model=self._get_url())
         self.client = OpenAIEmbeddings(
-            # model="Qwen/Qwen3-Embedding-0.6B",
-            # openai_api_base=f"{self._get_url()}/v1",
-            # openai_api_key="not-needed"
-            model="qwen3-embedding-0.6b",  # TEI 服务不需要这个参数，但保留也没关系
             openai_api_base=f"{self._get_url()}/v1", # 指向本地 TEI 服务
             openai_api_key="not-needed",  # 本地服务不需要真实 API key，但不能为空
         )

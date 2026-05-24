@@ -13,14 +13,14 @@ db_meta:
   host: localhost
   port: 3306
   user: lzs
-  password: lzs666
+  password: Lzs666
   database: meta
 
 db_dw:
   host: localhost
   port: 3306
   user: lzs
-  password: lzs666
+  password: Lzs666
   database: dw
 
 qdrant:
