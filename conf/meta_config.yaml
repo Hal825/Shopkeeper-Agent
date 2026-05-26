@@ -220,3 +220,24 @@ metrics:
 #    这里的 relevant_columns 很重要，因为它把“指标”和“底层字段”连接起来了。后面往元数据库写数据时，column_metric 这张关系表就是根据这个字段来生成的。
 
 #为什么不配置 type 和 examples:能通过程序自动查到的信息，就尽量不要再让用户手工填写。
+#tables:
+#  - name: fact_order
+#    role: fact
+#    description: "订单事实表"
+#    columns:
+#      - name: order_id
+#        role: primary_key
+#        alias: ["订单ID"]
+#        description: "订单ID"
+#        sync: false
+#      - name: customer_id
+#        role: foreign_key
+#        alias: ["客户ID"]
+#        description: "客户ID"
+#        sync: false
+#      - name: order_amount
+#        role: measure
+#        alias: ["销售额", "收入"]
+#        description: "销售额"
+#        sync: false
+#metrics: []

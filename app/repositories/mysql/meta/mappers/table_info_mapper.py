@@ -28,3 +28,5 @@ class TableInfoMapper:
     def to_model(table_info: TableInfo) -> TableInfoMySQL:
         """把业务实体转换成 ORM 模型，交给 SQLAlchemy 托管"""
         return TableInfoMySQL(**asdict(table_info))
+
+    # asdict是Python标准库dataclasses模块提供的一个函数，用来把dataclass实例转换成字典。

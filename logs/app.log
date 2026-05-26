@@ -4,3 +4,35 @@
 2026-05-25 21:22:36.017 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:137 - 检测到 metrics 配置，指标链路入口已准备就绪
 2026-05-25 21:22:36.018 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:138 - 指标入库与指标向量索引逻辑后续继续补充
 2026-05-25 21:22:36.018 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:140 - 当前阶段完成：配置加载与元数据知识库构建骨架准备
+2026-05-26 20:06:15.783 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:150 - 检测到 metrics 配置，指标链路入口已准备就绪
+2026-05-26 20:06:15.784 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:151 - 指标入库与指标向量索引逻辑后续继续补充
+2026-05-26 20:06:15.784 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:152 - 当前阶段完成：配置加载与元数据知识库构建骨架准备
+2026-05-26 20:08:22.564 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:154 - 检测到 metrics 配置，指标链路入口已准备就绪
+2026-05-26 20:08:22.564 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:155 - 指标入库与指标向量索引逻辑后续继续补充
+2026-05-26 20:08:22.564 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:157 - 当前阶段完成：配置加载与元数据知识库构建骨架准备
+2026-05-26 20:11:29.655 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:154 - 检测到 metrics 配置，指标链路入口已准备就绪
+2026-05-26 20:11:29.656 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:155 - 指标入库与指标向量索引逻辑后续继续补充
+2026-05-26 20:11:29.656 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:157 - 当前阶段完成：配置加载与元数据知识库构建骨架准备
+2026-05-26 20:11:37.406 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:154 - 检测到 metrics 配置，指标链路入口已准备就绪
+2026-05-26 20:11:37.407 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:155 - 指标入库与指标向量索引逻辑后续继续补充
+2026-05-26 20:11:37.407 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:157 - 当前阶段完成：配置加载与元数据知识库构建骨架准备
+2026-05-26 20:43:29.602 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:439 - 保存表信息和字段信息到 Meta MySQL
+2026-05-26 20:45:54.492 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:439 - 保存表信息和字段信息到 Meta MySQL
+2026-05-26 20:48:53.488 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:439 - 保存表信息和字段信息到 Meta MySQL
+2026-05-26 20:51:21.212 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:439 - 保存表信息和字段信息到 Meta MySQL
+2026-05-26 20:55:37.405 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:439 - 保存表信息和字段信息到 Meta MySQL
+2026-05-26 20:59:44.339 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:476 - 保存表信息和字段信息到 Meta MySQL
+2026-05-26 20:59:45.047 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:479 - 为字段信息建立向量索引
+2026-05-26 20:59:46.831 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:482 - 为字段取值建立全文索引
+2026-05-26 21:01:44.461 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:476 - 保存表信息和字段信息到 Meta MySQL
+2026-05-26 21:01:49.570 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:479 - 为字段信息建立向量索引
+2026-05-26 21:01:49.805 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:482 - 为字段取值建立全文索引
+2026-05-26 21:01:49.834 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:488 - 保存指标信息到数据库成功
+2026-05-26 21:03:35.326 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:511 - 保存表信息和字段信息到 Meta MySQL
+2026-05-26 21:03:40.358 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:514 - 为字段信息建立向量索引
+2026-05-26 21:03:40.473 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:517 - 为字段取值建立全文索引
+2026-05-26 21:05:54.710 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:543 - 保存表信息和字段信息到 Meta MySQL
+2026-05-26 21:05:59.785 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:546 - 为字段信息建立向量索引
+2026-05-26 21:05:59.867 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:549 - 为字段取值建立全文索引
+2026-05-26 21:05:59.888 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:555 - 保存指标信息到数据库成功
+2026-05-26 21:06:00.431 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:559 - 为指标信息建立向量索引成功

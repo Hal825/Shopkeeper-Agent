@@ -4,7 +4,7 @@ services:
     container_name: mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: @Lzs0825
+      MYSQL_ROOT_PASSWORD: "@Lzs0825"
       MYSQL_USER: lzs
       MYSQL_PASSWORD: Lzs666
     ports:
@@ -59,6 +59,7 @@ services:
       MODEL_ID: /models/bge-small-zh
       MAX_CONCURRENT_REQUESTS: "16"
       MAX_BATCH_TOKENS: "16384"
+      OPENAI_COMPATIBLE: "true"
     volumes:
       - ./embedding/bge-small-zh:/models/bge-small-zh
 
