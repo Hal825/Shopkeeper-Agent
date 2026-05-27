@@ -42,8 +42,16 @@ async def build(config_path: Path):
     qdrant_client_manager.init()
     # 初始化Embedding客户端
     embedding_client_manager.init()
-    # 初始化Elasticsearch客户端
-    es_client_manager.init()
+    # # 初始化Elasticsearch客户端
+    # es_client_manager.init()
+    # 初始化Elasticsearch客户端（容错）
+    try:
+        es_client_manager.init()
+        value_es_repository = ValueESRepository(es_client_manager.client)
+    except Exception:
+        from app.core.log import logger
+        logger.warning("Elasticsearch 不可用，跳过全文索引")
+        value_es_repository = None
 
     async with (
         meta_mysql_client_manager.session_factory() as meta_session,
@@ -55,7 +63,7 @@ async def build(config_path: Path):
         # 字段和指标分别写入不同的 Qdrant collection，后续可以独立召回
         column_qdrant_repository = ColumnQdrantRepository(qdrant_client_manager.client)
         embedding_client = embedding_client_manager.client
-        value_es_repository = ValueESRepository(es_client_manager.client)
+        # value_es_repository = ValueESRepository(es_client_manager.client)
         metric_qdrant_repository = MetricQdrantRepository(qdrant_client_manager.client)
 
         # 创建 service 对象，并把 repository 注入进去

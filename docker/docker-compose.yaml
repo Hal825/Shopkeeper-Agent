@@ -22,6 +22,11 @@ services:
     environment:
       discovery.type: single-node
       xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms256m -Xmx256m"
+    deploy:
+      resources:
+        limits:
+          memory: 512m
     ports:
       - "9200:9200"
     volumes:
@@ -42,6 +47,10 @@ services:
     image: qdrant/qdrant:v1.18.0
     container_name: qdrant
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128m
     ports:
       - "6333:6333"
       - "6334:6334"
@@ -49,7 +58,8 @@ services:
       - qdrant_data:/qdrant/storage
 
   embedding:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.4
+#    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
     platform: linux/amd64
     container_name: embedding
     restart: unless-stopped
@@ -57,8 +67,12 @@ services:
       - "8081:80"
     environment:
       MODEL_ID: /models/bge-small-zh
-      MAX_CONCURRENT_REQUESTS: "16"
-      MAX_BATCH_TOKENS: "16384"
+#      MAX_CONCURRENT_REQUESTS: "16"
+#      MAX_BATCH_TOKENS: "16384"
+#      16 并发 + 16384 tokens ❌（直接炸）
+#      低并发 + 小 batch ✅（稳定）
+      MAX_CONCURRENT_REQUESTS: "2"
+      MAX_BATCH_TOKENS: "4096"
       OPENAI_COMPATIBLE: "true"
     volumes:
       - ./embedding/bge-small-zh:/models/bge-small-zh

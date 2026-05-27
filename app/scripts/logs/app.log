@@ -12,3 +12,74 @@
 2026-05-24 14:15:17.455 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:47 - 检测到 metrics 配置，指标链路入口已准备就绪
 2026-05-24 14:15:17.455 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:48 - 指标入库与指标向量索引逻辑后续继续补充
 2026-05-24 14:15:17.455 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:50 - 当前阶段完成：配置加载与元数据知识库构建骨架准备
+2026-05-27 21:39:52.383 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:482 - 表字段信息已保存到 Meta MySQL
+2026-05-27 21:41:47.074 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:486 - 表字段信息已保存到 Meta MySQL
+2026-05-27 21:41:47.588 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:489 - 字段向量索引构建完成
+2026-05-27 21:43:29.174 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:502 - 表字段信息已保存到 Meta MySQL
+2026-05-27 21:43:29.449 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:505 - 字段向量索引构建完成
+2026-05-27 21:43:38.650 | WARNING  | request_id - 1 | app.services.meta_knowledge_service:_save_value_info_to_es:379 - Elasticsearch 不可用，跳过全文索引: Connection error caused by: ConnectionError(Connection error caused by: ClientConnectorError(Cannot connect to host localhost:9200 ssl:default [远程计算机拒绝网络连接。]))
+2026-05-27 21:43:38.650 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:509 - 字段取值全文索引处理完成（如已启用）
+2026-05-27 21:43:38.697 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:514 - 指标信息已保存到 Meta MySQL
+2026-05-27 21:43:38.765 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:517 - 指标向量索引构建完成
+2026-05-27 21:46:59.269 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:502 - 表字段信息已保存到 Meta MySQL
+2026-05-27 21:46:59.565 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:505 - 字段向量索引构建完成
+2026-05-27 21:46:59.705 | WARNING  | request_id - 1 | app.services.meta_knowledge_service:_save_value_info_to_es:379 - Elasticsearch 不可用，跳过全文索引: BadRequestError(400, 'None')
+2026-05-27 21:46:59.705 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:509 - 字段取值全文索引处理完成（如已启用）
+2026-05-27 21:46:59.737 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:514 - 指标信息已保存到 Meta MySQL
+2026-05-27 21:46:59.807 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:517 - 指标向量索引构建完成
+2026-05-27 21:52:28.348 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:502 - 表字段信息已保存到 Meta MySQL
+2026-05-27 21:52:28.744 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:505 - 字段向量索引构建完成
+2026-05-27 21:52:28.813 | WARNING  | request_id - 1 | app.services.meta_knowledge_service:_save_value_info_to_es:379 - Elasticsearch 不可用，跳过全文索引: BadRequestError(400, 'None')
+2026-05-27 21:52:28.813 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:509 - 字段取值全文索引处理完成（如已启用）
+2026-05-27 21:52:28.846 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:514 - 指标信息已保存到 Meta MySQL
+2026-05-27 21:52:28.893 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:517 - 指标向量索引构建完成
+2026-05-27 21:55:09.878 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:502 - 表字段信息已保存到 Meta MySQL
+2026-05-27 21:55:10.173 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:505 - 字段向量索引构建完成
+2026-05-27 21:55:10.181 | WARNING  | request_id - 1 | app.services.meta_knowledge_service:_save_value_info_to_es:379 - Elasticsearch 不可用，跳过全文索引: BadRequestError(400, 'None')
+2026-05-27 21:55:10.182 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:509 - 字段取值全文索引处理完成（如已启用）
+2026-05-27 21:55:10.210 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:514 - 指标信息已保存到 Meta MySQL
+2026-05-27 21:55:10.252 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:517 - 指标向量索引构建完成
+2026-05-27 21:58:37.447 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:502 - 表字段信息已保存到 Meta MySQL
+2026-05-27 21:58:37.712 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:505 - 字段向量索引构建完成
+2026-05-27 21:58:37.723 | WARNING  | request_id - 1 | app.services.meta_knowledge_service:_save_value_info_to_es:379 - Elasticsearch 不可用，跳过全文索引: BadRequestError(400, 'None')
+2026-05-27 21:58:37.723 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:509 - 字段取值全文索引处理完成（如已启用）
+2026-05-27 21:58:37.753 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:514 - 指标信息已保存到 Meta MySQL
+2026-05-27 21:58:37.792 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:517 - 指标向量索引构建完成
+2026-05-27 22:00:04.851 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:502 - 表字段信息已保存到 Meta MySQL
+2026-05-27 22:00:05.145 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:505 - 字段向量索引构建完成
+2026-05-27 22:00:05.155 | WARNING  | request_id - 1 | app.services.meta_knowledge_service:_save_value_info_to_es:379 - Elasticsearch 不可用，跳过全文索引: BadRequestError(400, 'None')
+2026-05-27 22:00:05.155 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:509 - 字段取值全文索引处理完成（如已启用）
+2026-05-27 22:00:05.188 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:514 - 指标信息已保存到 Meta MySQL
+2026-05-27 22:00:05.231 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:517 - 指标向量索引构建完成
+2026-05-27 22:02:05.452 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:502 - 表字段信息已保存到 Meta MySQL
+2026-05-27 22:02:05.723 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:505 - 字段向量索引构建完成
+2026-05-27 22:02:05.735 | WARNING  | request_id - 1 | app.services.meta_knowledge_service:_save_value_info_to_es:379 - Elasticsearch 不可用，跳过全文索引: BadRequestError(400, 'None')
+2026-05-27 22:02:05.735 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:509 - 字段取值全文索引处理完成（如已启用）
+2026-05-27 22:02:05.761 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:514 - 指标信息已保存到 Meta MySQL
+2026-05-27 22:02:05.805 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:517 - 指标向量索引构建完成
+2026-05-27 22:03:45.536 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:502 - 表字段信息已保存到 Meta MySQL
+2026-05-27 22:03:45.796 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:505 - 字段向量索引构建完成
+2026-05-27 22:03:45.810 | WARNING  | request_id - 1 | app.services.meta_knowledge_service:_save_value_info_to_es:379 - Elasticsearch 不可用，跳过全文索引: BadRequestError(400, 'None')
+2026-05-27 22:03:45.810 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:509 - 字段取值全文索引处理完成（如已启用）
+2026-05-27 22:03:45.842 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:514 - 指标信息已保存到 Meta MySQL
+2026-05-27 22:03:45.885 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:517 - 指标向量索引构建完成
+2026-05-27 22:04:57.829 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:502 - 表字段信息已保存到 Meta MySQL
+2026-05-27 22:04:58.105 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:505 - 字段向量索引构建完成
+2026-05-27 22:04:58.113 | WARNING  | request_id - 1 | app.services.meta_knowledge_service:_save_value_info_to_es:379 - Elasticsearch 不可用，跳过全文索引: BadRequestError(400, 'None')
+2026-05-27 22:04:58.113 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:509 - 字段取值全文索引处理完成（如已启用）
+2026-05-27 22:04:58.145 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:514 - 指标信息已保存到 Meta MySQL
+2026-05-27 22:04:58.182 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:517 - 指标向量索引构建完成
+2026-05-27 22:06:29.501 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:509 - 表字段信息已保存到 Meta MySQL
+2026-05-27 22:06:29.749 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:512 - 字段向量索引构建完成
+2026-05-27 22:06:30.252 | WARNING  | request_id - 1 | app.services.meta_knowledge_service:_save_value_info_to_es:418 - 全文索引写入失败: BadRequestError(400, 'media_type_header_exception', 'Invalid media-type value on headers [Accept, Content-Type]', Accept version must be either version 8 or 7, but found 9. Accept=application/vnd.elasticsearch+json; compatible-with=9)
+2026-05-27 22:06:30.253 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:516 - 字段取值全文索引处理完成（如已启用）
+2026-05-27 22:06:30.283 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:521 - 指标信息已保存到 Meta MySQL
+2026-05-27 22:06:30.321 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:524 - 指标向量索引构建完成
+2026-05-27 22:09:06.559 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:455 - 表字段信息已保存到 Meta MySQL
+2026-05-27 22:10:35.068 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:472 - 表字段信息已保存到 Meta MySQL
+2026-05-27 22:10:35.348 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:475 - 字段向量索引构建完成
+2026-05-27 22:10:36.894 | INFO     | request_id - 1 | app.repositories.es.value_es_repository:index:128 - 成功写入 24 条字段取值到 ES
+2026-05-27 22:10:36.896 | INFO     | request_id - 1 | app.services.meta_knowledge_service:_save_value_info_to_es:392 - 全文索引写入成功，共 24 条
+2026-05-27 22:10:36.896 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:478 - 字段取值全文索引处理完成（如已启用）
+2026-05-27 22:10:36.926 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:482 - 指标信息已保存到 Meta MySQL
+2026-05-27 22:10:36.964 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:485 - 指标向量索引构建完成

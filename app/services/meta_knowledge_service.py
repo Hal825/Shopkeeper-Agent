@@ -6,172 +6,236 @@
 #
 # 向量索引，全文索引和指标构建逻辑后续再逐步补充
 # """
-#
+# import asyncio
+# import uuid
+# from dataclasses import asdict
 # from pathlib import Path
 #
+# from langchain_huggingface import HuggingFaceEndpointEmbeddings
 # from omegaconf import OmegaConf
 #
 # from app.conf.meta_config import MetaConfig
 # from app.core.log import logger
 # from app.entities.column_info import ColumnInfo
+# from app.entities.column_metric import ColumnMetric
+# from app.entities.metric_info import MetricInfo
 # from app.entities.table_info import TableInfo
+# from app.entities.value_info import ValueInfo
+# from app.repositories.es.value_es_repository import ValueESRepository
 # from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 # from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
-#
-#
-# class MetaKnowledgeService:
-#     """负责串联元数据知识库构建流程的应用服务"""
-#
-#     def __init__(
-#         self,
-#         meta_mysql_repository: MetaMySQLRepository,
-#         dw_mysql_repository: DWMySQLRepository,
-#     ):
-#         # meta repository 负责结构化元数据的落库
-#         self.meta_mysql_repository: MetaMySQLRepository = meta_mysql_repository
-#         # dw repository 负责到教学数仓中读取真实表结构和示例值
-#         self.dw_mysql_repository: DWMySQLRepository = dw_mysql_repository
-#     async def build(self, config_path: Path):
-#         context = OmegaConf.load(config_path)
-#         schema = OmegaConf.structured(MetaConfig)
-#         meta_config: MetaConfig = OmegaConf.to_object(OmegaConf.merge(schema, context))
-#
-#         table_infos: list[TableInfo] = []
-#         column_infos: list[ColumnInfo] = []
-#
-#         if meta_config.tables:
-#             for table in meta_config.tables:
-#                 table_info = TableInfo(
-#                     id=table.name,
-#                     name=table.name,
-#                     role=table.role,
-#                     description=table.description,
-#                 )
-#                 table_infos.append(table_info)
-#
-#                 column_types = await self.dw_mysql_repository.get_column_types(table.name)
-#                 for column in table.columns:
-#                     column_values = await self.dw_mysql_repository.get_column_values(
-#                         table.name, column.name
-#                     )
-#                     column_info = ColumnInfo(
-#                         id=f"{table.name}.{column.name}",
-#                         name=column.name,
-#                         type=column_types[column.name],
-#                         role=column.role,
-#                         examples=column_values,
-#                         description=column.description,
-#                         alias=column.alias,
-#                         table_id=table.name,
-#                     )
-#                     column_infos.append(column_info)
-#
-#         # ✅ 新增：在事务内先清空旧数据
-#         async with self.meta_mysql_repository.session.begin():
-#             from sqlalchemy import text
-#             await self.meta_mysql_repository.session.execute(text("DELETE FROM column_info"))
-#             await self.meta_mysql_repository.session.execute(text("DELETE FROM table_info"))
-#             # 然后保存新数据
-#             self.meta_mysql_repository.save_table_infos(table_infos)
-#             self.meta_mysql_repository.save_column_infos(column_infos)
-#
-#             print(table_infos)
-#             print(column_infos)
-#
-#         if meta_config.metrics:
-#             logger.info("检测到 metrics 配置，指标链路入口已准备就绪")
-#             logger.info("指标入库与指标向量索引逻辑后续继续补充")
-#
-#         logger.info("当前阶段完成：配置加载与元数据知识库构建骨架准备")
-#
-# from pathlib import Path
-# from omegaconf import OmegaConf
-# from app.conf.meta_config import MetaConfig
-# from app.core.log import logger
-# from app.entities.column_info import ColumnInfo
-# from app.entities.table_info import TableInfo
-# from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
-# from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
+# from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantRepository
+# from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
 #
 # class MetaKnowledgeService:
 #     def __init__(
 #             self,
 #             meta_mysql_repository: MetaMySQLRepository,
 #             dw_mysql_repository: DWMySQLRepository,
+#             column_qdrant_repository: ColumnQdrantRepository,
+#             embedding_client: HuggingFaceEndpointEmbeddings,
+#             value_es_repository: ValueESRepository = None,  # 可选，当前不用
+#             metric_qdrant_repository: MetricQdrantRepository = None,  # 可选
 #     ):
-#         self.meta_mysql_repository: MetaMySQLRepository = meta_mysql_repository
-#         self.dw_mysql_repository: DWMySQLRepository = dw_mysql_repository
+#         self.meta_mysql_repository = meta_mysql_repository
+#         self.dw_mysql_repository = dw_mysql_repository
+#         self.column_qdrant_repository = column_qdrant_repository
+#         self.embedding_client = embedding_client
+#         self.value_es_repository = value_es_repository
+#         self.metric_qdrant_repository = metric_qdrant_repository
+#
+#     async def _save_column_info_to_qdrant(self, column_infos: list[ColumnInfo]):
+#         await self.column_qdrant_repository.ensure_collection()
+#
+#         batch_size = 1   # 你的环境内存很紧，批次可以小一点
+#         batch_points = []
+#
+#         for column_info in column_infos:
+#             text = f"""
+# 字段名: {column_info.name}
+# 业务含义: {column_info.description}
+# 别名: {",".join(column_info.alias[:3])}
+# 所属表: {column_info.table_id}
+# 字段类型: {column_info.role}
+# 示例值: {",".join(map(str, column_info.examples[:3]))}
+# """.strip()
+#
+#             batch_points.append({
+#                 "id": str(uuid.uuid4()),
+#                 "embedding_text": text,
+#                 "payload": asdict(column_info),
+#             })
+#
+#             if len(batch_points) >= batch_size:
+#                 await self._flush_column_batch(batch_points)
+#                 batch_points.clear()
+#
+#         if batch_points:
+#             await self._flush_column_batch(batch_points)
+#
+#     async def _flush_column_batch(self, batch_points):
+#         texts = [p["embedding_text"] for p in batch_points]
+#         ids = [p["id"] for p in batch_points]
+#         payloads = [p["payload"] for p in batch_points]
+#
+#         # 这里直接调你本地的 embedding 服务
+#         loop = asyncio.get_running_loop()
+#         embeddings = await loop.run_in_executor(
+#             None, self.embedding_client.embed_documents, texts
+#         )
+#
+#         await self.column_qdrant_repository.upsert(ids, embeddings, payloads)
+#
+#     async def _save_tables_to_meta_db(self, meta_config: MetaConfig) -> list[ColumnInfo]:
+#         table_infos: list[TableInfo] = []
+#         column_infos: list[ColumnInfo] = []
+#
+#         for table in meta_config.tables:
+#             table_info = TableInfo(
+#                 id=table.name,
+#                 name=table.name,
+#                 role=table.role,
+#                 description=table.description,
+#             )
+#             table_infos.append(table_info)
+#
+#             column_types = await self.dw_mysql_repository.get_column_types(table.name)
+#             for column in table.columns:
+#                 column_values = await self.dw_mysql_repository.get_column_values(
+#                     table.name, column.name
+#                 )
+#                 column_info = ColumnInfo(
+#                     id=f"{table.name}.{column.name}",
+#                     name=column.name,
+#                     type=column_types[column.name],
+#                     role=column.role,
+#                     examples=column_values,
+#                     description=column.description,
+#                     alias=column.alias,
+#                     table_id=table.name,
+#                 )
+#                 column_infos.append(column_info)
+#
+#         async with self.meta_mysql_repository.session.begin():
+#             self.meta_mysql_repository.save_table_infos(table_infos)
+#             self.meta_mysql_repository.save_column_infos(column_infos)
+#
+#         return column_infos
+#
+#
+#     async def _save_value_info_to_es(self, meta_config: MetaConfig, column_infos: list[ColumnInfo]):
+#         await self.value_es_repository.ensure_index()
+#
+#         # 建立字段ID -> sync标志的映射
+#         col_sync = {}
+#         for table in meta_config.tables:
+#             for col in table.columns:
+#                 col_sync[f"{table.name}.{col.name}"] = col.sync
+#
+#         value_infos = []
+#         for col_info in column_infos:
+#             if col_sync.get(col_info.id, False):
+#                 # 取大量真实值（limit 100000）
+#                 values = await self.dw_mysql_repository.get_column_values(
+#                     col_info.table_id, col_info.name, 100000
+#                 )
+#                 for v in values:
+#                     value_infos.append(ValueInfo(
+#                         id=f"{col_info.id}.{v}",
+#                         value=v,
+#                         column_id=col_info.id,
+#                     ))
+#
+#         await self.value_es_repository.index(value_infos)
+#
+#     async def _save_metrics_to_meta_db(self, meta_config: MetaConfig) -> list[MetricInfo]:
+#         metric_infos = []
+#         column_metrics = []
+#
+#         for metric in meta_config.metrics:
+#             m = MetricInfo(
+#                 id=metric.name,
+#                 name=metric.name,
+#                 description=metric.description,
+#                 relevant_columns=metric.relevant_columns,
+#                 alias=metric.alias,
+#             )
+#             metric_infos.append(m)
+#             for col in metric.relevant_columns:
+#                 column_metrics.append(ColumnMetric(column_id=col, metric_id=metric.name))
+#
+#         async with self.meta_mysql_repository.session.begin():
+#             self.meta_mysql_repository.save_metric_infos(metric_infos)
+#             self.meta_mysql_repository.save_column_metrics(column_metrics)
+#
+#         return metric_infos
+#
+#     async def _save_metrics_to_qdrant(self, metric_infos: list[MetricInfo]):
+#         await self.metric_qdrant_repository.ensure_collection()
+#
+#         points = []
+#         for m in metric_infos:
+#             points.append({"id": uuid.uuid4(), "embedding_text": m.name, "payload": asdict(m)})
+#             points.append({"id": uuid.uuid4(), "embedding_text": m.description, "payload": asdict(m)})
+#             for alias in m.alias:
+#                 points.append({"id": uuid.uuid4(), "embedding_text": alias, "payload": asdict(m)})
+#
+#         texts = [p["embedding_text"] for p in points]
+#         batch_size = 20
+#         embeddings = []
+#         for i in range(0, len(texts), batch_size):
+#             batch = texts[i:i + batch_size]
+#             batch_emb = await self.embedding_client.aembed_documents(batch)
+#             embeddings.extend(batch_emb)
+#
+#         ids = [p["id"] for p in points]
+#         payloads = [p["payload"] for p in points]
+#         await self.metric_qdrant_repository.upsert(ids, embeddings, payloads)
 #
 #     async def build(self, config_path: Path):
 #         context = OmegaConf.load(config_path)
 #         schema = OmegaConf.structured(MetaConfig)
 #         meta_config: MetaConfig = OmegaConf.to_object(OmegaConf.merge(schema, context))
 #
-#         table_infos: list[TableInfo] = []
-#         column_infos: list[ColumnInfo] = []
-#
 #         if meta_config.tables:
-#             for table in meta_config.tables:
-#                 table_info = TableInfo(
-#                     id=table.name,
-#                     name=table.name,
-#                     role=table.role,
-#                     description=table.description,
-#                 )
-#                 table_infos.append(table_info)
-#
-#                 # ✅ 这些代码应该在 for table 循环内部
-#                 column_types = await self.dw_mysql_repository.get_column_types(table.name)
-#
-#                 for column in table.columns:
-#                     column_values = await self.dw_mysql_repository.get_column_values(
-#                         table.name, column.name
-#                     )
-#                     column_info = ColumnInfo(
-#                         id=f"{table.name}.{column.name}",
-#                         name=column.name,
-#                         type=column_types[column.name],
-#                         role=column.role,
-#                         examples=column_values,
-#                         description=column.description,
-#                         alias=column.alias,
-#                         table_id=table.name,
-#                     )
-#                     column_infos.append(column_info)
-#
-#         # 入库（在循环外面，一次性保存所有表和列）
-#         async with self.meta_mysql_repository.session.begin():
-#             from sqlalchemy import text
-#             await self.meta_mysql_repository.session.execute(text("DELETE FROM column_info"))
-#             await self.meta_mysql_repository.session.execute(text("DELETE FROM table_info"))
-#             self.meta_mysql_repository.save_table_infos(table_infos)
-#             self.meta_mysql_repository.save_column_infos(column_infos)
-#
-#             print(table_infos)
-#             print(column_infos)
+#             # 1. 入库 Meta MySQL
+#             column_infos = await self._save_tables_to_meta_db(meta_config)
+#             logger.info("保存表信息和字段信息到 Meta MySQL")
+#             # 2. 构建向量索引
+#             await self._save_column_info_to_qdrant(column_infos)
+#             logger.info("为字段信息建立向量索引")
+#             # 3. 全文索引暂时跳过（内存不足）
+#             # if self.value_es_repository and meta_config.enable_es:
+#             #     await self._save_value_info_to_es(meta_config, column_infos)
+#             #     logger.info("为字段取值建立全文索引")
 #
 #         if meta_config.metrics:
-#             logger.info("检测到 metrics 配置，指标链路入口已准备就绪")
-#             logger.info("指标入库与指标向量索引逻辑后续继续补充")
-#
-#         logger.info("当前阶段完成：配置加载与元数据知识库构建骨架准备")
+#             logger.info("检测到 metrics 配置，暂不处理")
+#             # 等以后补充
+#             # metric_infos = await self._save_metrics_to_meta_db(meta_config)
+#             # await self._save_metrics_to_qdrant(metric_infos)
+
+
+
+
 """
-元数据知识构建服务
+元数据知识构建服务（完整版，可直接替换）
 
-负责组织元数据知识库构建的核心业务流程，位于脚本入口和仓储层之间
-一方面接收配置文件，另一方面协调元数据库和数仓查询仓储
-
-当前这条主线已经覆盖表字段入库 字段向量索引 字段取值全文索引
-以及指标入库和指标向量索引构建逻辑
+负责组织元数据知识库构建的核心业务流程，位于脚本入口和仓储层之间。
+当前主线覆盖：
+- 表字段入库
+- 字段向量索引（拆分语义入口）
+- 字段取值全文索引（可选，依赖 ES）
+- 指标入库
+- 指标向量索引
 """
 
 import uuid
-import httpx
 from dataclasses import asdict
 from pathlib import Path
+from typing import Optional
 from sqlalchemy import text
 
-from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from omegaconf import OmegaConf
 
 from app.conf.meta_config import MetaConfig
@@ -196,32 +260,23 @@ class MetaKnowledgeService:
         meta_mysql_repository: MetaMySQLRepository,
         dw_mysql_repository: DWMySQLRepository,
         column_qdrant_repository: ColumnQdrantRepository,
-        embedding_client: HuggingFaceEndpointEmbeddings,
-        value_es_repository: ValueESRepository,
-        metric_qdrant_repository: MetricQdrantRepository,
+        embedding_client,  # 实际是 HuggingFaceEmbeddings，通过异步封装调用
+        value_es_repository: Optional[ValueESRepository] = None,
+        metric_qdrant_repository: Optional[MetricQdrantRepository] = None,
     ):
-        # meta repository 负责结构化元数据的落库
-        self.meta_mysql_repository: MetaMySQLRepository = meta_mysql_repository
-        # dw repository 负责到教学数仓中读取真实表结构和示例值
-        self.dw_mysql_repository: DWMySQLRepository = dw_mysql_repository
-        # 字段向量集合的创建和写入统一交给 Qdrant Repository
-        self.column_qdrant_repository: ColumnQdrantRepository = column_qdrant_repository
-        # 向量化动作放在 Service 层
-        self.embedding_client: HuggingFaceEndpointEmbeddings = embedding_client
-        # 字段值全文索引的写入统一交给 ES Repository
-        self.value_es_repository: ValueESRepository = value_es_repository
-        # 指标向量集合和字段向量集合分开管理，便于后续按对象类型独立召回
-        self.metric_qdrant_repository: MetricQdrantRepository = metric_qdrant_repository
+        self.meta_mysql_repository = meta_mysql_repository
+        self.dw_mysql_repository = dw_mysql_repository
+        self.column_qdrant_repository = column_qdrant_repository
+        self.embedding_client = embedding_client
+        self.value_es_repository = value_es_repository
+        self.metric_qdrant_repository = metric_qdrant_repository
 
-    async def _save_tables_to_meta_db(
-        self, meta_config: MetaConfig
-    ) -> list[ColumnInfo]:
-        """把配置里的表字段信息补齐后写入 Meta MySQL"""
+    # ========== 表与字段入库 ==========
+    async def _save_tables_to_meta_db(self, meta_config: MetaConfig) -> list[ColumnInfo]:
         table_infos: list[TableInfo] = []
         column_infos: list[ColumnInfo] = []
 
         for table in meta_config.tables:
-            # 先把配置里的表定义整理成业务实体，后面统一交给 Meta Repository 落库
             table_info = TableInfo(
                 id=table.name,
                 name=table.name,
@@ -230,15 +285,12 @@ class MetaKnowledgeService:
             )
             table_infos.append(table_info)
 
-            # 字段类型属于数仓里的真实信息，所以这里仍然要回到 DW 查询
             column_types = await self.dw_mysql_repository.get_column_types(table.name)
 
             for column in table.columns:
-                # 这里只拿少量示例值，目的是让字段元数据更容易被人和模型理解
                 column_values = await self.dw_mysql_repository.get_column_values(
                     table.name, column.name
                 )
-                # 字段 id 使用 table.column 形式，后续在向量索引和全文索引里都会复用
                 column_info = ColumnInfo(
                     id=f"{table.name}.{column.name}",
                     name=column.name,
@@ -251,309 +303,183 @@ class MetaKnowledgeService:
                 )
                 column_infos.append(column_info)
 
+        # 清空旧数据，避免主键冲突
+        session = self.meta_mysql_repository.session
+        await session.execute(text("DELETE FROM column_info"))
+        await session.execute(text("DELETE FROM table_info"))
+        await session.commit()
+
         async with self.meta_mysql_repository.session.begin():
-            # 先清空旧数据（保证每次构建都是全量替换）
-            await self.meta_mysql_repository.session.execute(
-                text("DELETE FROM column_info")
-            )
-            await self.meta_mysql_repository.session.execute(
-                text("DELETE FROM table_info")
-            )
-            # 再写入新数据
             self.meta_mysql_repository.save_table_infos(table_infos)
             self.meta_mysql_repository.save_column_infos(column_infos)
 
         return column_infos
 
-    # async def _save_column_info_to_qdrant(self, column_infos: list[ColumnInfo]):
-    #     """把字段元数据继续推进成可语义检索的 Qdrant 向量点"""
-    #     await self.column_qdrant_repository.ensure_collection()
-    #
-    #     points: list[dict] = []
-    #     for column_info in column_infos:
-    #         # 一个字段不会只生成一个向量点，而是把名字 描述 别名都拆开建立语义入口
-    #         points.append(
-    #             {
-    #                 "id": uuid.uuid4(),
-    #                 "embedding_text": column_info.name,
-    #                 "payload": asdict(column_info),
-    #             }
-    #         )
-    #
-    #         points.append(
-    #             {
-    #                 "id": uuid.uuid4(),
-    #                 "embedding_text": column_info.description,
-    #                 "payload": asdict(column_info),
-    #             }
-    #         )
-    #
-    #         for alia in column_info.alias:
-    #             points.append(
-    #                 {
-    #                     "id": uuid.uuid4(),
-    #                     "embedding_text": alia,
-    #                     "payload": asdict(column_info),
-    #                 }
-    #             )
-    #
-    #     # 先把待向量化文本抽出来，再分批调用 Embedding 服务
-    #     # 这样更容易控制单次请求大小
-    #     embeddings: list[list[float]] = []
-    #     embedding_texts = [point["embedding_text"] for point in points]
-    #     embedding_batch_size = 4
-    #     for i in range(0, len(embedding_texts), embedding_batch_size):
-    #         batch_embedding_texts = embedding_texts[i : i + embedding_batch_size]
-    #         batch_embeddings = await self.embedding_client.aembed_documents(
-    #             batch_embedding_texts
-    #         )
-    #         embeddings.extend(batch_embeddings)
-    #
-    #     ids = [point["id"] for point in points]
-    #     payloads = [point["payload"] for point in points]
-    #
-    #     await self.column_qdrant_repository.upsert(ids, embeddings, payloads)
-
+    # ========== 字段向量索引（拆点模式，提高召回率） ==========
     async def _save_column_info_to_qdrant(self, column_infos: list[ColumnInfo]):
-        """把字段元数据继续推进成可语义检索的 Qdrant 向量点（逐条调用，避免 TEI 崩溃）"""
         await self.column_qdrant_repository.ensure_collection()
 
         points: list[dict] = []
-        for column_info in column_infos:
+        for col in column_infos:
+            # 拆成多条语义入口：字段名、描述、别名各为一个点
             points.append({
                 "id": str(uuid.uuid4()),
-                "embedding_text": column_info.name,
-                "payload": asdict(column_info),
+                "embedding_text": col.name,
+                "payload": asdict(col),
             })
             points.append({
                 "id": str(uuid.uuid4()),
-                "embedding_text": column_info.description,
-                "payload": asdict(column_info),
+                "embedding_text": col.description,
+                "payload": asdict(col),
             })
-            for alia in column_info.alias:
+            for alia in col.alias:
                 points.append({
                     "id": str(uuid.uuid4()),
                     "embedding_text": alia,
-                    "payload": asdict(column_info),
+                    "payload": asdict(col),
                 })
 
-        embeddings: list[list[float]] = []
-        async with httpx.AsyncClient(base_url="http://localhost:8081/v1", timeout=30.0) as client:
-            for point in points:
-                text = point["embedding_text"]
-                resp = await client.post("/embeddings", json={"input": [text], "model": ""})
-                resp.raise_for_status()
-                data = resp.json()
-                embeddings.append(data["data"][0]["embedding"])
+        # 分批向量化
+        texts = [p["embedding_text"] for p in points]
+        batch_size = 20
+        embeddings = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i : i + batch_size]
+            batch_emb = await self.embedding_client.aembed_documents(batch)
+            embeddings.extend(batch_emb)
 
-        ids = [point["id"] for point in points]
-        payloads = [point["payload"] for point in points]
+        ids = [p["id"] for p in points]
+        payloads = [p["payload"] for p in points]
         await self.column_qdrant_repository.upsert(ids, embeddings, payloads)
 
-    async def _save_value_info_to_es(
-        self, meta_config: MetaConfig, column_infos: list[ColumnInfo]
-    ):
-        """把允许同步的字段真实取值写入 Elasticsearch 全文索引"""
-        await self.value_es_repository.ensure_index()
+    # ========== ES 全文索引（可选） ==========
+    async def _save_value_info_to_es(self, meta_config: MetaConfig, column_infos: list[ColumnInfo]):
+        if not self.value_es_repository:
+            logger.info("ValueESRepository 未配置，跳过全文索引")
+            return
 
-        # 不是所有字段都要同步真实值，是否同步由配置里的 sync 显式控制
-        column2sync: dict[str, bool] = {}
+        try:
+            await self.value_es_repository.ensure_index()
+        except Exception as e:
+            logger.warning(f"Elasticsearch 不可用，跳过全文索引: {e}")
+            return
+
+        # 建立字段ID -> sync标志的映射
+        col_sync = {}
         for table in meta_config.tables:
-            for column in table.columns:
-                column2sync[f"{table.name}.{column.name}"] = column.sync
+            for col in table.columns:
+                col_sync[f"{table.name}.{col.name}"] = col.sync
 
-        value_infos: list[ValueInfo] = []
-        for column_info in column_infos:
-            sync = column2sync[column_info.id]
-            if sync:
-                # 这里拿的是字段真实值全集，不再是第 8 章里的少量 examples
-                current_column_values = (
-                    await self.dw_mysql_repository.get_column_values(
-                        column_info.table_id, column_info.name, 100000
+        value_infos = []
+        for col_info in column_infos:
+            if col_sync.get(col_info.id, False):
+                try:
+                    values = await self.dw_mysql_repository.get_column_values(
+                        col_info.table_id, col_info.name, 100000
                     )
-                )
-                current_values_infos = [
-                    ValueInfo(
-                        id=f"{column_info.id}.{current_column_value}",
-                        value=current_column_value,
-                        column_id=column_info.id,
-                    )
-                    for current_column_value in current_column_values
-                ]
-                value_infos.extend(current_values_infos)
+                except Exception:
+                    continue
+                for v in values:
+                    value_infos.append(ValueInfo(
+                        id=f"{col_info.id}.{v}",
+                        value=v,
+                        column_id=col_info.id,
+                    ))
 
-        await self.value_es_repository.index(value_infos)
+        # 写入 ES（内部已用 httpx 解决版本兼容问题）
+        try:
+            await self.value_es_repository.index(value_infos)
+            logger.info(f"全文索引写入成功，共 {len(value_infos)} 条")
+        except Exception as e:
+            logger.warning(f"全文索引写入失败: {e}")
 
-    # async def _save_metrics_to_meta_db(
-    #     self, meta_config: MetaConfig
-    # ) -> list[MetricInfo]:
-    #     """把配置里的指标信息和字段依赖关系写入 Meta MySQL"""
-    #     metric_infos: list[MetricInfo] = []
-    #     column_metrics: list[ColumnMetric] = []
-    #
-    #     for metric in meta_config.metrics:
-    #         # MetricInfo 表达指标本身，当前直接用指标名作为稳定业务 id
-    #         metric_info = MetricInfo(
-    #             id=metric.name,
-    #             name=metric.name,
-    #             description=metric.description,
-    #             relevant_columns=metric.relevant_columns,
-    #             alias=metric.alias,
-    #         )
-    #         metric_infos.append(metric_info)
-    #         for column in metric.relevant_columns:
-    #             # ColumnMetric 单独表达“某个指标依赖某个字段”这层关系
-    #             column_metric = ColumnMetric(column_id=column, metric_id=metric.name)
-    #             column_metrics.append(column_metric)
-    #
-    #     # 指标本身和字段关系要放在同一笔事务里，避免只写入其中一部分
-    #     async with self.meta_mysql_repository.session.begin():
-    #         self.meta_mysql_repository.save_metric_infos(metric_infos)
-    #         self.meta_mysql_repository.save_column_metrics(column_metrics)
-    #
-    #     return metric_infos
-    async def _save_metrics_to_meta_db(
-            self, meta_config: MetaConfig
-    ) -> list[MetricInfo]:
-        metric_infos: list[MetricInfo] = []
-        column_metrics: list[ColumnMetric] = []
+    # ========== 指标入库 ==========
+    async def _save_metrics_to_meta_db(self, meta_config: MetaConfig) -> list[MetricInfo]:
+        metric_infos = []
+        column_metrics = []
 
         for metric in meta_config.metrics:
-            metric_info = MetricInfo(
+            m = MetricInfo(
                 id=metric.name,
                 name=metric.name,
                 description=metric.description,
                 relevant_columns=metric.relevant_columns,
                 alias=metric.alias,
             )
-            metric_infos.append(metric_info)
-            for column in metric.relevant_columns:
-                column_metric = ColumnMetric(column_id=column, metric_id=metric.name)
-                column_metrics.append(column_metric)
+            metric_infos.append(m)
+            for col in metric.relevant_columns:
+                column_metrics.append(ColumnMetric(column_id=col, metric_id=metric.name))
+
+        # 清空旧数据
+        session = self.meta_mysql_repository.session
+        await session.execute(text("DELETE FROM column_metric"))
+        await session.execute(text("DELETE FROM metric_info"))
+        await session.commit()
 
         async with self.meta_mysql_repository.session.begin():
-            # 先清空旧数据（保证每次构建都是全量替换）
-            await self.meta_mysql_repository.session.execute(
-                text("DELETE FROM column_metric")
-            )
-            await self.meta_mysql_repository.session.execute(
-                text("DELETE FROM metric_info")
-            )
-            # 再写入新数据
             self.meta_mysql_repository.save_metric_infos(metric_infos)
             self.meta_mysql_repository.save_column_metrics(column_metrics)
 
         return metric_infos
 
-    # async def _save_metrics_to_qdrant(self, metric_infos: list[MetricInfo]):
-    #     """把指标元数据继续推进成可语义检索的 Qdrant 向量点"""
-    #     await self.metric_qdrant_repository.ensure_collection()
-    #
-    #     points: list[dict] = []
-    #     for metric_info in metric_infos:
-    #         # 和字段一样，一个指标也会拆成名字 描述 别名这几类语义入口
-    #         points.append(
-    #             {
-    #                 "id": uuid.uuid4(),
-    #                 "embedding_text": metric_info.name,
-    #                 "payload": asdict(metric_info),
-    #             }
-    #         )
-    #
-    #         points.append(
-    #             {
-    #                 "id": uuid.uuid4(),
-    #                 "embedding_text": metric_info.description,
-    #                 "payload": asdict(metric_info),
-    #             }
-    #         )
-    #
-    #         for alia in metric_info.alias:
-    #             points.append(
-    #                 {
-    #                     "id": uuid.uuid4(),
-    #                     "embedding_text": alia,
-    #                     "payload": asdict(metric_info),
-    #                 }
-    #             )
-    #
-    #     # 先把待向量化文本抽出来，再分批调用 Embedding 服务
-    #     # 返回的 embeddings 要继续和前面的 id payload 按顺序对齐
-    #     embeddings: list[list[float]] = []
-    #     embedding_texts = [point["embedding_text"] for point in points]
-    #     embedding_batch_size = 4
-    #     for i in range(0, len(embedding_texts), embedding_batch_size):
-    #         batch_embedding_texts = embedding_texts[i : i + embedding_batch_size]
-    #         batch_embeddings = await self.embedding_client.aembed_documents(
-    #             batch_embedding_texts
-    #         )
-    #         embeddings.extend(batch_embeddings)
-    #
-    #     ids = [point["id"] for point in points]
-    #     payloads = [point["payload"] for point in points]
-    #
-    #     await self.metric_qdrant_repository.upsert(ids, embeddings, payloads)
+    # ========== 指标向量索引 ==========
     async def _save_metrics_to_qdrant(self, metric_infos: list[MetricInfo]):
-        """把指标元数据继续推进成可语义检索的 Qdrant 向量点（逐条调用）"""
+        if not self.metric_qdrant_repository:
+            logger.info("MetricQdrantRepository 未配置，跳过指标向量索引")
+            return
+
         await self.metric_qdrant_repository.ensure_collection()
 
-        points: list[dict] = []
-        for metric_info in metric_infos:
+        points = []
+        for m in metric_infos:
             points.append({
                 "id": str(uuid.uuid4()),
-                "embedding_text": metric_info.name,
-                "payload": asdict(metric_info),
+                "embedding_text": m.name,
+                "payload": asdict(m),
             })
             points.append({
                 "id": str(uuid.uuid4()),
-                "embedding_text": metric_info.description,
-                "payload": asdict(metric_info),
+                "embedding_text": m.description,
+                "payload": asdict(m),
             })
-            for alia in metric_info.alias:
+            for alias in m.alias:
                 points.append({
                     "id": str(uuid.uuid4()),
-                    "embedding_text": alia,
-                    "payload": asdict(metric_info),
+                    "embedding_text": alias,
+                    "payload": asdict(m),
                 })
 
-        embeddings: list[list[float]] = []
-        async with httpx.AsyncClient(base_url="http://localhost:8081/v1", timeout=30.0) as client:
-            for point in points:
-                text = point["embedding_text"]
-                resp = await client.post("/embeddings", json={"input": [text], "model": ""})
-                resp.raise_for_status()
-                data = resp.json()
-                embeddings.append(data["data"][0]["embedding"])
+        texts = [p["embedding_text"] for p in points]
+        batch_size = 20
+        embeddings = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i : i + batch_size]
+            batch_emb = await self.embedding_client.aembed_documents(batch)
+            embeddings.extend(batch_emb)
 
-        ids = [point["id"] for point in points]
-        payloads = [point["payload"] for point in points]
+        ids = [p["id"] for p in points]
+        payloads = [p["payload"] for p in points]
         await self.metric_qdrant_repository.upsert(ids, embeddings, payloads)
 
+    # ========== 总控构建 ==========
     async def build(self, config_path: Path):
-        """读取配置并依次构建 Meta MySQL Qdrant 和 ES 中的元数据索引"""
         context = OmegaConf.load(config_path)
         schema = OmegaConf.structured(MetaConfig)
         meta_config: MetaConfig = OmegaConf.to_object(OmegaConf.merge(schema, context))
 
-        # 根据配置文件判断后续要进入哪条构建链路
         if meta_config.tables:
-
-            # 将表信息和字段信息保存到 Meta MySQL
             column_infos = await self._save_tables_to_meta_db(meta_config)
-            logger.info("保存表信息和字段信息到 Meta MySQL")
-            # 对字段信息建立向量索引
+            logger.info("表字段信息已保存到 Meta MySQL")
+
             await self._save_column_info_to_qdrant(column_infos)
-            logger.info("为字段信息建立向量索引")
-            # 对指定的维度字段取值建立全文索引
+            logger.info("字段向量索引构建完成")
+
             await self._save_value_info_to_es(meta_config, column_infos)
-            logger.info("为字段取值建立全文索引")
+            logger.info("字段取值全文索引处理完成（如已启用）")
 
-        # 根据配置文件同步指定的指标信息
         if meta_config.metrics:
-            # 将指标信息和字段依赖关系保存到 Meta MySQL
             metric_infos = await self._save_metrics_to_meta_db(meta_config)
-            logger.info("保存指标信息到数据库成功")
+            logger.info("指标信息已保存到 Meta MySQL")
 
-            # 对指标信息建立向量索引
             await self._save_metrics_to_qdrant(metric_infos)
-            logger.info("为指标信息建立向量索引成功")
+            logger.info("指标向量索引构建完成")

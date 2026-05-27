@@ -1,46 +1,44 @@
 import asyncio
+import os
 from typing import Optional
 
-from langchain_huggingface import HuggingFaceEndpointEmbeddings
-from langchain_openai import OpenAIEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings  # 只用本地模型
 from app.conf.app_config import EmbeddingConfig, app_config
 
 
 class EmbeddingClientManager:
     def __init__(self, config: EmbeddingConfig):
-        # 客户端在模块导入阶段先不立即创建，避免启动时就发起外部依赖连接
-        self.client: Optional[HuggingFaceEndpointEmbeddings] = None
-        # 保存 Embedding 服务配置，供 init() 时组装服务访问地址使用
+        self.client: Optional[HuggingFaceEmbeddings] = None
         self.config = config
 
-    def _get_url(self):
-        # 当前项目通过 host + port 访问外部已启动的 Embedding 推理服务
-        return f"http://{self.config.host}:{self.config.port}"
-
     def init(self):
-        # 在应用启动阶段显式调用，完成真正的客户端初始化
-        # self.client = HuggingFaceEndpointEmbeddings(model=self._get_url())
-        self.client = OpenAIEmbeddings(
-            openai_api_base=f"{self._get_url()}/v1", # 指向本地 TEI 服务
-            openai_api_key="not-needed",  # 本地服务不需要真实 API key，但不能为空
+        # 自动计算项目根目录，避免相对路径问题
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        model_path = os.path.join(project_root, "docker", "embedding", "bge-small-zh")
+
+        self.client = HuggingFaceEmbeddings(
+            model_name=model_path,
+            model_kwargs={"device": "cpu"},
+            encode_kwargs={"normalize_embeddings": True}
         )
 
+    # 提供异步友好的封装
+    async def aembed_query(self, text: str):
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self.client.embed_query, text)
 
-# 模块级单例，供其他模块按需复用同一个客户端管理器
+    async def aembed_documents(self, texts: list[str]):
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self.client.embed_documents, texts)
+
+
+# 单例
 embedding_client_manager = EmbeddingClientManager(app_config.embedding)
 
 
 if __name__ == "__main__":
-    # 本地调试入口：初始化客户端后执行一次最小化向量化调用
     embedding_client_manager.init()
-    client = embedding_client_manager.client
-
     async def test():
-        # 使用示例文本验证 Embedding 服务是否可正常响应
-        text = "What is deep learning?"
-        query_result = await client.aembed_query(text)
-        # 只打印前 3 个维度，便于快速确认返回结果结构正确
-        print(query_result[:3])
-
-    # 运行调试测试
+        vec = await embedding_client_manager.aembed_query("测试")
+        print(len(vec))
     asyncio.run(test())
