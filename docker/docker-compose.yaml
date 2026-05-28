@@ -7,13 +7,16 @@ services:
       MYSQL_ROOT_PASSWORD: "@Lzs0825"
       MYSQL_USER: lzs
       MYSQL_PASSWORD: Lzs666
+      LANG: C.UTF-8
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql:/docker-entrypoint-initdb.d
-    command: --character-set-server=utf8mb4
+    command:
+      --character-set-server=utf8mb4
       --collation-server=utf8mb4_general_ci
+      --skip-character-set-client-handshake
 
   elasticsearch:
     build: ./elasticsearch
@@ -58,8 +61,8 @@ services:
       - qdrant_data:/qdrant/storage
 
   embedding:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.4
-#    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
+#    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.4
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
     platform: linux/amd64
     container_name: embedding
     restart: unless-stopped
