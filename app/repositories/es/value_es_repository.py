@@ -72,6 +72,8 @@ from app.entities.value_info import ValueInfo
 from app.core.log import logger
 
 class ValueESRepository:
+    """负责字段取值全文索引的创建与批量写入"""
+
     index_name = "value_index"
     index_mappings = {
         "dynamic": False,
@@ -90,39 +92,25 @@ class ValueESRepository:
         self.client = client
 
     async def ensure_index(self):
-        # 使用 httpx 确保索引存在
-        url = f"http://localhost:9200/{self.index_name}"
-        async with httpx.AsyncClient() as http_client:
-            resp = await http_client.head(url)
-            if resp.status_code == 404:
-                create_resp = await http_client.put(
-                    url,
-                    json={"mappings": self.index_mappings}
-                )
-                if create_resp.status_code not in (200, 201):
-                    raise Exception(f"创建索引失败: {create_resp.status_code} {create_resp.text}")
+        """确保字段取值索引已经创建好"""
+        if not await self.client.indices.exists(index=self.index_name):
+            await self.client.indices.create(
+                index=self.index_name,
+                body={"mappings": self.index_mappings}  # 通过 body 传递，兼容性最佳
+            )
+            logger.info("索引创建成功")
 
     async def index(self, value_infos: list[ValueInfo], batch_size=20):
-        """使用 httpx 发送 bulk 请求，避免 elasticsearch-py 版本冲突"""
+        """分批写入字段取值，避免一次 bulk 过大"""
         if not value_infos:
             return
 
         for i in range(0, len(value_infos), batch_size):
             batch = value_infos[i : i + batch_size]
-            # 构造 bulk 请求体：每行一个操作元数据或文档，以换行符分隔，末尾加换行
-            lines = []
+            operations = []
             for v in batch:
-                lines.append(json.dumps({"index": {"_index": self.index_name, "_id": v.id}}))
-                lines.append(json.dumps(asdict(v)))
-            body = "\n".join(lines) + "\n"
+                operations.append({"index": {"_index": self.index_name, "_id": v.id}})
+                operations.append(asdict(v))
+            await self.client.bulk(operations=operations)
 
-            url = f"http://localhost:9200/_bulk"
-            async with httpx.AsyncClient() as http_client:
-                resp = await http_client.post(
-                    url,
-                    content=body,
-                    headers={"Content-Type": "application/x-ndjson"}
-                )
-                if resp.status_code != 200:
-                    raise Exception(f"Bulk 写入失败: {resp.status_code} {resp.text}")
         logger.info(f"成功写入 {len(value_infos)} 条字段取值到 ES")

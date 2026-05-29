@@ -94,6 +94,7 @@ class ColumnQdrantRepository:
                 collection_name=self.collection_name,
                 vectors_config=VectorParams(
                     size=app_config.qdrant.embedding_size, distance=Distance.COSINE
+                    # collection在创建时就已经确定了两个关键约束：向量维度是多少，相似度比较方式是什么。
                 ),
             )
 
@@ -108,6 +109,7 @@ class ColumnQdrantRepository:
         points: list[PointStruct] = [
             PointStruct(id=id, vector=embedding, payload=payload)
             for id, embedding, payload in zip(ids, embeddings, payloads)
+            # 重新把并行数组拼回完整向量点
         ]
         for i in range(0, len(points), batch_size):
             await self.client.upsert(

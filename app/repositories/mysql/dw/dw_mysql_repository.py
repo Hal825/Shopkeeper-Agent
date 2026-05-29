@@ -59,10 +59,17 @@ class DWMySQLRepository:
         result_dict = result.mappings().fetchall()
         return {row["Field"]: row["Type"] for row in result_dict}
 
-    async def get_column_values(
-        self, table_name: str, column_name: str, limit: int = 10
-    ) -> list:
-        """抽样查询字段示例值，供元数据入库和后续检索链路复用"""
+    async def get_column_values(self, table_name: str, column_name: str, limit: int = 1000) -> list:
         sql = f"select distinct {column_name} from {table_name} limit {limit}"
+        # print(f"[DEBUG] 数据库连接: {self.session.bind.url}")
+        # print(f"[DEBUG] 执行SQL: {sql}")
+
         result = await self.session.execute(text(sql))
-        return [row[0] for row in result.fetchall()]
+        rows = result.fetchall()
+        raw_values = [row[0] for row in rows]
+        # print(f"[DEBUG] 原始返回值: {raw_values[:5]}... (总数 {len(raw_values)})")
+
+        # 特别注意检查是否有 None 或空字符串
+        non_null = [v for v in raw_values if v is not None and v != '']
+        # print(f"[DEBUG] 非空值数量: {len(non_null)}")
+        return raw_values
