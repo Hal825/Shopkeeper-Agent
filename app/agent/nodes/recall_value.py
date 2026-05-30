@@ -5,19 +5,27 @@
 当用户问题里出现店铺名 类目名 地区名等业务值时，这一步可以帮助定位真实字段和值
 """
 
+import asyncio
 from langgraph.runtime import Runtime
-
 from app.agent.context import DataAgentContext
 from app.agent.state import DataAgentState
-
+from app.core.log import logger
 
 async def recall_value(state: DataAgentState, runtime: Runtime[DataAgentContext]):
-    """召回和用户问题相关的字段取值"""
-
     writer = runtime.stream_writer
-    # 通过流式事件标记当前已经进入字段取值检索分支
     writer("召回字段取值")
-    import asyncio
 
-    # 当前章节先保留占位逻辑，后续接入 Elasticsearch 检索
-    await asyncio.sleep(0.5)
+    keywords = state.get("keywords", [])
+    if not keywords:
+        logger.warning("[recall_value] 没有关键词，跳过召回")
+        return {"retrieved_value_infos": []}
+
+    query_text = " ".join(keywords)
+    value_repo = runtime.context["value_es_repository"]
+    retrieved_values = await value_repo.search(query_text, limit=10)
+
+    logger.info(f"[recall_value] 检索到 {len(retrieved_values)} 条字段取值信息")
+    for v in retrieved_values[:5]:
+        logger.info(f"  - {v.column_id}: {v.value}")
+
+    return {"retrieved_value_infos": retrieved_values}

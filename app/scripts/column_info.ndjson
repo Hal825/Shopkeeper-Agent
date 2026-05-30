@@ -1,0 +1,24 @@
+{"id": "dim_customer.customer_id", "name": "customer_id", "role": "primary_key", "type": "varchar(20)", "alias": ["客户ID", "用户ID"], "table_id": "dim_customer", "description": "客户唯一标识。"}
+{"id": "dim_customer.customer_name", "name": "customer_name", "role": "dimension", "type": "varchar(50)", "alias": ["客户名称", "用户名称"], "table_id": "dim_customer", "description": "客户名称。"}
+{"id": "dim_customer.gender", "name": "gender", "role": "dimension", "type": "varchar(10)", "alias": ["性别"], "table_id": "dim_customer", "description": "客户性别。"}
+{"id": "dim_customer.member_level", "name": "member_level", "role": "dimension", "type": "varchar(20)", "alias": ["会员等级", "用户等级"], "table_id": "dim_customer", "description": "客户会员等级。"}
+{"id": "dim_date.date_id", "name": "date_id", "role": "primary_key", "type": "int", "alias": ["日期ID", "日期"], "table_id": "dim_date", "description": "日期唯一标识，格式 yyyyMMdd。"}
+{"id": "dim_date.day", "name": "day", "role": "dimension", "type": "int", "alias": ["日", "天"], "table_id": "dim_date", "description": "日。"}
+{"id": "dim_date.month", "name": "month", "role": "dimension", "type": "int", "alias": ["月", "月份"], "table_id": "dim_date", "description": "月份。"}
+{"id": "dim_date.quarter", "name": "quarter", "role": "dimension", "type": "varchar(2)", "alias": ["季度"], "table_id": "dim_date", "description": "季度。"}
+{"id": "dim_date.year", "name": "year", "role": "dimension", "type": "int", "alias": ["年", "年份"], "table_id": "dim_date", "description": "年份。"}
+{"id": "dim_product.brand", "name": "brand", "role": "dimension", "type": "varchar(50)", "alias": ["品牌", "品牌名称"], "table_id": "dim_product", "description": "商品品牌名称。"}
+{"id": "dim_product.category", "name": "category", "role": "dimension", "type": "varchar(50)", "alias": ["商品类别", "品类", "分类"], "table_id": "dim_product", "description": "商品所属品类。"}
+{"id": "dim_product.product_id", "name": "product_id", "role": "primary_key", "type": "varchar(20)", "alias": ["商品ID", "产品ID"], "table_id": "dim_product", "description": "商品唯一标识。"}
+{"id": "dim_product.product_name", "name": "product_name", "role": "dimension", "type": "varchar(200)", "alias": ["商品名称", "产品名称"], "table_id": "dim_product", "description": "商品名称。"}
+{"id": "dim_region.country", "name": "country", "role": "dimension", "type": "varchar(50)", "alias": ["国家", "国家名称"], "table_id": "dim_region", "description": "地区所属国家名称。"}
+{"id": "dim_region.province", "name": "province", "role": "dimension", "type": "varchar(50)", "alias": ["省份", "省", "所在省份"], "table_id": "dim_region", "description": "订单所属的省份名称。"}
+{"id": "dim_region.region_id", "name": "region_id", "role": "primary_key", "type": "varchar(20)", "alias": ["地区ID", "区域ID"], "table_id": "dim_region", "description": "地区唯一标识。"}
+{"id": "dim_region.region_name", "name": "region_name", "role": "dimension", "type": "varchar(50)", "alias": ["地区", "区域", "大区"], "table_id": "dim_region", "description": "订单所属的大区名称，如华东、华南等。"}
+{"id": "fact_order.customer_id", "name": "customer_id", "role": "foreign_key", "type": "varchar(20)", "alias": ["客户ID", "用户ID"], "table_id": "fact_order", "description": "关联客户维度的外键。"}
+{"id": "fact_order.date_id", "name": "date_id", "role": "foreign_key", "type": "int", "alias": ["日期", "下单日期"], "table_id": "fact_order", "description": "关联时间维度的外键。"}
+{"id": "fact_order.order_amount", "name": "order_amount", "role": "measure", "type": "float", "alias": ["销售额", "订单金额", "收入"], "table_id": "fact_order", "description": "订单金额。"}
+{"id": "fact_order.order_id", "name": "order_id", "role": "primary_key", "type": "varchar(30)", "alias": ["订单ID"], "table_id": "fact_order", "description": "订单唯一标识。"}
+{"id": "fact_order.order_quantity", "name": "order_quantity", "role": "measure", "type": "int", "alias": ["销量", "购买数量", "件数"], "table_id": "fact_order", "description": "订单中商品的购买数量。"}
+{"id": "fact_order.product_id", "name": "product_id", "role": "foreign_key", "type": "varchar(20)", "alias": ["商品ID", "产品ID"], "table_id": "fact_order", "description": "关联商品维度的外键。"}
+{"id": "fact_order.region_id", "name": "region_id", "role": "foreign_key", "type": "varchar(20)", "alias": ["地区ID", "区域ID"], "table_id": "fact_order", "description": "关联地区维度的外键。"}

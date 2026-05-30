@@ -1,0 +1,2 @@
+{"id": "AOV", "name": "AOV", "alias": ["平均单价", "平均订单金额"], "description": "全称Average Order Value，表示所有订单的成交金额平均值。", "relevant_columns": ["fact_order.order_amount"]}
+{"id": "GMV", "name": "GMV", "alias": ["成交总额", "订单总额"], "description": "全称Gross Merchandise Value，表示所有订单的成交金额总和。", "relevant_columns": ["fact_order.order_amount"]}

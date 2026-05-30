@@ -5,19 +5,34 @@
 它帮助 Agent 把“销售额 转化率 客单价”等业务表达映射到已定义指标
 """
 
+import asyncio
 from langgraph.runtime import Runtime
-
 from app.agent.context import DataAgentContext
 from app.agent.state import DataAgentState
-
+from app.core.log import logger
 
 async def recall_metric(state: DataAgentState, runtime: Runtime[DataAgentContext]):
-    """召回和用户问题语义相关的业务指标"""
-
     writer = runtime.stream_writer
-    # 指标召回和字段召回并行执行，输出进度可以看清图的运行顺序
     writer("召回指标信息")
-    import asyncio
 
-    # 当前章节先保留占位逻辑，后续接入 MetricQdrantRepository 查询
-    await asyncio.sleep(0.5)
+    keywords = state.get("keywords", [])
+    if not keywords:
+        logger.warning("[recall_metric] 没有关键词，跳过召回")
+        return {"retrieved_metric_infos": []}
+
+    query_text = " ".join(keywords)
+    embedding_client = runtime.context["embedding_client"]
+    embedding = await asyncio.to_thread(embedding_client.embed_query, query_text)
+
+    metric_repo = runtime.context["metric_qdrant_repository"]
+    retrieved_metrics = await metric_repo.search(
+        embedding=embedding,
+        score_threshold=0.6,
+        limit=10
+    )
+
+    logger.info(f"[recall_metric] 检索到 {len(retrieved_metrics)} 条指标信息")
+    for m in retrieved_metrics[:5]:
+        logger.info(f"  - {m.id}: {m.name}")
+
+    return {"retrieved_metric_infos": retrieved_metrics}

@@ -236,3 +236,16 @@
 2026-05-28 18:07:45.071 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:269 - 字段取值全文索引处理完成（如已启用）
 2026-05-28 18:07:45.106 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:273 - 指标信息已保存到 Meta MySQL
 2026-05-28 18:07:45.158 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:276 - 指标向量索引构建完成
+2026-05-30 18:05:44.171 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:263 - 表字段信息已保存到 Meta MySQL
+2026-05-30 18:05:44.721 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:266 - 字段向量索引构建完成
+2026-05-30 18:05:46.044 | INFO     | request_id - 1 | app.repositories.es.value_es_repository:index:116 - 成功写入 75 条字段取值到 ES
+2026-05-30 18:05:46.044 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:269 - 字段取值全文索引处理完成（如已启用）
+2026-05-30 18:05:46.097 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:273 - 指标信息已保存到 Meta MySQL
+2026-05-30 18:05:46.286 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:276 - 指标向量索引构建完成
+2026-05-30 18:06:32.325 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:263 - 表字段信息已保存到 Meta MySQL
+2026-05-30 18:06:48.734 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:263 - 表字段信息已保存到 Meta MySQL
+2026-05-30 18:06:49.296 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:266 - 字段向量索引构建完成
+2026-05-30 18:06:49.464 | INFO     | request_id - 1 | app.repositories.es.value_es_repository:index:116 - 成功写入 75 条字段取值到 ES
+2026-05-30 18:06:49.464 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:269 - 字段取值全文索引处理完成（如已启用）
+2026-05-30 18:06:49.483 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:273 - 指标信息已保存到 Meta MySQL
+2026-05-30 18:06:49.572 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:276 - 指标向量索引构建完成

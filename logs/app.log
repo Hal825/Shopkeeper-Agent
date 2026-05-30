@@ -36,3 +36,9 @@
 2026-05-26 21:05:59.867 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:549 - 为字段取值建立全文索引
 2026-05-26 21:05:59.888 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:555 - 保存指标信息到数据库成功
 2026-05-26 21:06:00.431 | INFO     | request_id - 1 | app.services.meta_knowledge_service:build:559 - 为指标信息建立向量索引成功
+2026-05-30 16:57:53.115 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:166 - 合并后的表信息：[]
+2026-05-30 16:57:53.116 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:167 - 合并后的指标信息：[]
+2026-05-30 17:02:32.192 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:166 - 合并后的表信息：[]
+2026-05-30 17:02:32.194 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:167 - 合并后的指标信息：[]
+2026-05-30 17:10:00.250 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:166 - 合并后的表信息：[]
+2026-05-30 17:10:00.250 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:167 - 合并后的指标信息：[]

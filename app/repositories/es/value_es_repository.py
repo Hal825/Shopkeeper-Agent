@@ -114,3 +114,29 @@ class ValueESRepository:
             await self.client.bulk(operations=operations)
 
         logger.info(f"成功写入 {len(value_infos)} 条字段取值到 ES")
+
+    async def search(self, query: str, limit: int = 10) -> list[ValueInfo]:
+        """根据关键词全文检索字段取值，返回 ValueInfo 列表"""
+        body = {
+            "query": {
+                "match": {
+                    "value": query  # 使用 value 字段进行 match 查询
+                }
+            },
+            "size": limit
+        }
+        try:
+            response = await self.client.search(index=self.index_name, body=body)
+            hits = response["hits"]["hits"]
+            result = []
+            for hit in hits:
+                source = hit["_source"]
+                result.append(ValueInfo(
+                    id=source["id"],
+                    column_id=source["column_id"],
+                    value=source["value"]
+                ))
+            return result
+        except Exception as e:
+            logger.error(f"ES 检索失败: {e}")
+            return []

@@ -1,0 +1,26 @@
+2026-05-30 17:04:53.280 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:166 - 合并后的表信息：[]
+2026-05-30 17:04:53.281 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:167 - 合并后的指标信息：[]
+2026-05-30 18:00:15.520 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:166 - 合并后的表信息：[]
+2026-05-30 18:00:15.528 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:167 - 合并后的指标信息：[]
+2026-05-30 18:06:03.180 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:166 - 合并后的表信息：[]
+2026-05-30 18:06:03.180 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:167 - 合并后的指标信息：[]
+2026-05-30 18:07:34.530 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:166 - 合并后的表信息：[]
+2026-05-30 18:07:34.531 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:167 - 合并后的指标信息：[]
+2026-05-30 18:20:54.901 | INFO     | request_id - 1 | app.agent.nodes.extract_keywords:extract_keywords:22 - [extract_keywords] 原始 query: 统计华北地区的销售总额
+2026-05-30 18:20:54.901 | INFO     | request_id - 1 | app.agent.nodes.extract_keywords:extract_keywords:23 - [extract_keywords] 提取的关键词: ['统计华北地区的销售总额']
+2026-05-30 18:23:57.737 | INFO     | request_id - 1 | app.agent.nodes.extract_keywords:extract_keywords:22 - [extract_keywords] 原始 query: 统计华北地区的销售总额
+2026-05-30 18:23:57.738 | INFO     | request_id - 1 | app.agent.nodes.extract_keywords:extract_keywords:23 - [extract_keywords] 提取的关键词: ['统计华北地区的销售总额']
+2026-05-30 18:23:58.129 | INFO     | request_id - 1 | app.agent.nodes.recall_value:recall_value:27 - [recall_value] 检索到 1 条字段取值信息
+2026-05-30 18:23:58.130 | INFO     | request_id - 1 | app.agent.nodes.recall_value:recall_value:29 -   - dim_region.region_name: 华北
+2026-05-30 18:23:58.234 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:35 - [recall_column] 检索到 4 条字段信息
+2026-05-30 18:23:58.234 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - fact_order.order_amount: order_amount
+2026-05-30 18:23:58.234 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - fact_order.order_amount: order_amount
+2026-05-30 18:23:58.234 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - fact_order.order_quantity: order_quantity
+2026-05-30 18:23:58.234 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - fact_order.order_quantity: order_quantity
+2026-05-30 18:23:58.235 | INFO     | request_id - 1 | app.agent.nodes.recall_metric:recall_metric:34 - [recall_metric] 检索到 4 条指标信息
+2026-05-30 18:23:58.235 | INFO     | request_id - 1 | app.agent.nodes.recall_metric:recall_metric:36 -   - GMV: GMV
+2026-05-30 18:23:58.235 | INFO     | request_id - 1 | app.agent.nodes.recall_metric:recall_metric:36 -   - GMV: GMV
+2026-05-30 18:23:58.235 | INFO     | request_id - 1 | app.agent.nodes.recall_metric:recall_metric:36 -   - GMV: GMV
+2026-05-30 18:23:58.235 | INFO     | request_id - 1 | app.agent.nodes.recall_metric:recall_metric:36 -   - GMV: GMV
+2026-05-30 18:23:58.431 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:166 - 合并后的表信息：['fact_order', 'dim_region']
+2026-05-30 18:23:58.431 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:167 - 合并后的指标信息：['GMV', 'GMV', 'GMV', 'GMV']
