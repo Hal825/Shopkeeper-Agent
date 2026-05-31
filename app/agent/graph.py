@@ -85,8 +85,14 @@ graph_builder.add_conditional_edges(
     path=lambda state: "run_sql" if state["error"] is None else "correct_sql",
     path_map={"run_sql": "run_sql", "correct_sql": "correct_sql"},
 )
+
+# 在生产级系统里，通常会扩展成带次数限制的循环：
+# 生成 SQL -> 校验 -> 校正 -> 再校验 -> 最多重试 N 次 -> 执行或返回失败
+# 从 correct_sql 节点到 run_sql 节点的边，只有当流程经过 correct_sql 节点时才会用到这条边。
 graph_builder.add_edge("correct_sql", "run_sql")
 graph_builder.add_edge("run_sql", END)
+
+
 
 # 编译后的 graph 是对外使用的 Agent 执行入口
 graph = graph_builder.compile()

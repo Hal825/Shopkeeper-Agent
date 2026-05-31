@@ -51,3 +51,14 @@ class DWMySQLRepository:
         # dialect 来自 SQLAlchemy 当前绑定的数据库方言，例如 mysql
         dialect = self.session.bind.dialect.name
         return {"dialect": dialect, "version": version}
+
+    async def validate(self, sql: str):
+        """用 EXPLAIN 让数据库提前解析 SQL，发现语法 表名 字段名等错误"""
+        sql = f"explain {sql}"
+        await self.session.execute(text(sql))
+
+    async def run(self, sql: str) -> list[dict]:
+        """执行最终 SQL，并把 SQLAlchemy 行对象转换成前端更易消费的字典列表"""
+        # 这里做了两件事。第一，执行SQL：第二，把查询结果转成字典列表：
+        result = await self.session.execute(text(sql))
+        return [dict(row) for row in result.mappings().fetchall()]
