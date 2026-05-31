@@ -29,10 +29,11 @@ from app.agent.state import DataAgentState
 from app.clients.embedding_client_manager import embedding_client_manager
 from app.clients.es_client_manager import es_client_manager
 from app.clients.mysql_client_manager import (
-    meta_mysql_client_manager,
+    meta_mysql_client_manager, dw_mysql_client_manager,
 )
 from app.clients.qdrant_client_manager import qdrant_client_manager
 from app.repositories.es.value_es_repository import ValueESRepository
+from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
 from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantRepository
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
@@ -55,6 +56,7 @@ graph_builder.add_node("correct_sql", correct_sql)
 graph_builder.add_node("run_sql", run_sql)
 
 # 从用户问题开始，先抽取关键词作为后续检索的基础
+# 定义边（执行顺序）
 graph_builder.add_edge(START, "extract_keywords")
 
 # 关键词抽取后并行进入三类召回，分别面向字段 字段值和业务指标
@@ -101,12 +103,15 @@ if __name__ == "__main__":
         embedding_client_manager.init()
         es_client_manager.init()
         meta_mysql_client_manager.init()
+        dw_mysql_client_manager.init()
 
         # 合并召回信息时会按字段 id 表 id 查询 Meta MySQL，所以这里额外创建元数据仓储
         async with (
             meta_mysql_client_manager.session_factory() as meta_session,
+            dw_mysql_client_manager.session_factory() as dw_session,
         ):
             meta_mysql_repository = MetaMySQLRepository(meta_session)
+            dw_mysql_repository = DWMySQLRepository(dw_session)
 
             # 字段和指标分别使用不同 Qdrant collection，取值检索使用 ES index
             column_qdrant_repository = ColumnQdrantRepository(
@@ -119,7 +124,7 @@ if __name__ == "__main__":
 
             # 当前只需要传入原始问题，后续节点会逐步把 keywords 和三类召回结果写回 state
             state = DataAgentState(
-                query="统计华北地区的销售总额",
+                query="统计华北地区的销售总额和平均额",
                 keywords=[],
                 retrieved_column_infos=[],
                 retrieved_metric_infos=[],
@@ -134,13 +139,30 @@ if __name__ == "__main__":
                 metric_qdrant_repository=metric_qdrant_repository,
                 value_es_repository=value_es_repository,
                 meta_mysql_repository=meta_mysql_repository,
+                dw_mysql_repository=dw_mysql_repository,
             )
 
             # stream_mode="custom" 会接收各节点通过 runtime.stream_writer 写出的进度信息
             async for update in graph.astream(
-                input=state, context=context, stream_mode="updates"
+                    input=state,  # 初始状态
+                    context=context,  # 运行时上下文（依赖注入）
+                    stream_mode="updates"  # 流模式：只返回节点产生的“增量更新”
             ):
-                print(update)
+                 # print(update)  # 每次迭代打印一个节点产生的状态变更
+                 # 只对 merge_retrieved_info 节点做特殊处理
+                 if "merge_retrieved_info" in update:
+                     tables = update["merge_retrieved_info"].get("table_infos", [])
+                     print("===== 合并后的表信息 =====")
+                     for t in tables:
+                         # 假设 t 是字典，包含 name, role, description 等
+                         print(f"表名: {t['name']} | 角色: {t['role']} | 描述: {t['description']}")
+                     # 你也可以顺便打印指标信息
+                     metrics = update["merge_retrieved_info"].get("metric_infos", [])
+                     print(f"指标: {', '.join([m['name'] for m in metrics])}")
+                     print("------------------------")
+                 else:
+                     # 其他节点（如 extract_keywords, recall_*）保持原样打印
+                     print(update)
 
         # 关闭显式创建的异步客户端，避免本地调试时连接资源悬挂
         await qdrant_client_manager.close()

@@ -28,7 +28,7 @@ async def recall_column(state: DataAgentState, runtime: Runtime[DataAgentContext
     column_repo = runtime.context["column_qdrant_repository"]
     retrieved_columns = await column_repo.search(
         embedding=embedding,
-        score_threshold=0.6,
+        score_threshold=0.4,
         limit=20
     )
 

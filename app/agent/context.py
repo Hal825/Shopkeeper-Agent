@@ -15,7 +15,7 @@ from app.repositories.es.value_es_repository import ValueESRepository
 from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
 from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantRepository
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
-
+from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 
 class DataAgentContext(TypedDict):
     """LangGraph Runtime 中传递的上下文对象"""
@@ -30,3 +30,5 @@ class DataAgentContext(TypedDict):
     value_es_repository: ValueESRepository
     # 元数据仓储，负责在召回结果合并时补齐字段 表 主外键等结构信息
     meta_mysql_repository: MetaMySQLRepository
+
+    dw_mysql_repository: DWMySQLRepository
