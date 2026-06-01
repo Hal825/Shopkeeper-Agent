@@ -42,3 +42,46 @@
 2026-05-30 17:02:32.194 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:167 - 合并后的指标信息：[]
 2026-05-30 17:10:00.250 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:166 - 合并后的表信息：[]
 2026-05-30 17:10:00.250 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:167 - 合并后的指标信息：[]
+2026-06-01 20:15:23.597 | INFO     | request_id - 1 | app.agent.nodes.extract_keywords:extract_keywords:22 - [extract_keywords] 原始 query: 统计华北地区销售额
+2026-06-01 20:15:23.598 | INFO     | request_id - 1 | app.agent.nodes.extract_keywords:extract_keywords:23 - [extract_keywords] 提取的关键词: ['统计华北地区销售额']
+2026-06-01 20:15:23.774 | INFO     | request_id - 1 | app.agent.nodes.recall_value:recall_value:27 - [recall_value] 检索到 1 条字段取值信息
+2026-06-01 20:15:23.775 | INFO     | request_id - 1 | app.agent.nodes.recall_value:recall_value:29 -   - dim_region.region_name: 华北
+2026-06-01 20:15:23.956 | INFO     | request_id - 1 | app.agent.nodes.recall_metric:recall_metric:40 - [recall_metric] 检索到 2 条指标信息
+2026-06-01 20:15:23.960 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:35 - [recall_column] 检索到 5 条字段信息
+2026-06-01 20:15:23.960 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - fact_order.order_amount: order_amount
+2026-06-01 20:15:23.960 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - fact_order.order_quantity: order_quantity
+2026-06-01 20:15:23.960 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - dim_region.region_name: region_name
+2026-06-01 20:15:23.960 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - dim_region.province: province
+2026-06-01 20:15:23.960 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - dim_customer.member_level: member_level
+2026-06-01 20:15:24.256 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:166 - 合并后的表信息：['fact_order', 'dim_region', 'dim_customer']
+2026-06-01 20:15:24.256 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:167 - 合并后的指标信息：['GMV', 'AOV']
+2026-06-01 20:15:27.052 | INFO     | request_id - 1 | app.agent.nodes.filter_metric:filter_metric:54 - 过滤后的指标信息：['GMV']
+2026-06-01 20:15:28.244 | INFO     | request_id - 1 | app.agent.nodes.filter_table:filter_table:60 - 过滤后的表信息：['fact_order', 'dim_region']
+2026-06-01 20:15:28.256 | INFO     | request_id - 1 | app.agent.nodes.add_extra_context:add_extra_context:35 - 数据库信息：{'dialect': 'mysql', 'version': '8.0.46'}
+2026-06-01 20:15:28.256 | INFO     | request_id - 1 | app.agent.nodes.add_extra_context:add_extra_context:36 - 日期信息：{'date': '2026-06-01', 'weekday': 'Monday', 'quarter': 'Q2'}
+2026-06-01 20:15:31.387 | INFO     | request_id - 1 | app.agent.nodes.generate_sql:generate_sql:59 - 生成的SQL：SELECT SUM(f.order_amount) AS 销售额 FROM fact_order f JOIN dim_region r ON f.region_id = r.region_id WHERE r.region_name = '华北'
+2026-06-01 20:15:31.405 | INFO     | request_id - 1 | app.agent.nodes.validate_sql:validate_sql:31 - SQL语法正确
+2026-06-01 20:15:31.411 | INFO     | request_id - 1 | app.agent.nodes.run_sql:run_sql:28 - SQL执行结果：[{'销售额': 41099.5}]
+2026-06-01 20:16:57.722 | INFO     | request_id - 1 | app.agent.nodes.extract_keywords:extract_keywords:22 - [extract_keywords] 原始 query: 统计华北地区销售额
+2026-06-01 20:16:57.723 | INFO     | request_id - 1 | app.agent.nodes.extract_keywords:extract_keywords:23 - [extract_keywords] 提取的关键词: ['统计华北地区销售额']
+2026-06-01 20:16:57.841 | INFO     | request_id - 1 | app.agent.nodes.recall_value:recall_value:27 - [recall_value] 检索到 1 条字段取值信息
+2026-06-01 20:16:57.841 | INFO     | request_id - 1 | app.agent.nodes.recall_value:recall_value:29 -   - dim_region.region_name: 华北
+2026-06-01 20:16:57.870 | INFO     | request_id - 1 | app.agent.nodes.recall_metric:recall_metric:40 - [recall_metric] 检索到 2 条指标信息
+2026-06-01 20:16:57.872 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:35 - [recall_column] 检索到 5 条字段信息
+2026-06-01 20:16:57.872 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - fact_order.order_amount: order_amount
+2026-06-01 20:16:57.872 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - fact_order.order_quantity: order_quantity
+2026-06-01 20:16:57.872 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - dim_region.region_name: region_name
+2026-06-01 20:16:57.873 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - dim_region.province: province
+2026-06-01 20:16:57.873 | INFO     | request_id - 1 | app.agent.nodes.recall_column:recall_column:37 -   - dim_customer.member_level: member_level
+2026-06-01 20:16:57.893 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:166 - 合并后的表信息：['fact_order', 'dim_region', 'dim_customer']
+2026-06-01 20:16:57.894 | INFO     | request_id - 1 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:167 - 合并后的指标信息：['GMV', 'AOV']
+2026-06-01 20:17:01.163 | INFO     | request_id - 1 | app.agent.nodes.filter_metric:filter_metric:54 - 过滤后的指标信息：['GMV']
+2026-06-01 20:17:01.174 | INFO     | request_id - 1 | app.agent.nodes.filter_table:filter_table:60 - 过滤后的表信息：['fact_order', 'dim_region']
+2026-06-01 20:17:01.195 | INFO     | request_id - 1 | app.agent.nodes.add_extra_context:add_extra_context:35 - 数据库信息：{'dialect': 'mysql', 'version': '8.0.46'}
+2026-06-01 20:17:01.195 | INFO     | request_id - 1 | app.agent.nodes.add_extra_context:add_extra_context:36 - 日期信息：{'date': '2026-06-01', 'weekday': 'Monday', 'quarter': 'Q2'}
+2026-06-01 20:17:04.172 | INFO     | request_id - 1 | app.agent.nodes.generate_sql:generate_sql:59 - 生成的SQL：SELECT SUM(f.order_amount) AS total_sales
+FROM fact_order f
+JOIN dim_region r ON f.region_id = r.region_id
+WHERE r.region_name = '华北';
+2026-06-01 20:17:04.176 | INFO     | request_id - 1 | app.agent.nodes.validate_sql:validate_sql:31 - SQL语法正确
+2026-06-01 20:17:04.178 | INFO     | request_id - 1 | app.agent.nodes.run_sql:run_sql:28 - SQL执行结果：[{'total_sales': 41099.5}]

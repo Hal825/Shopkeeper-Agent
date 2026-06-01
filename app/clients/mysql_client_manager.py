@@ -32,6 +32,23 @@ class MySQLClientManager:
         self.session_factory = async_sessionmaker(
             self.engine, autoflush=True, expire_on_commit=False
         )
+    # def init(self):
+    #     print(f"Initializing MySQL client for {self.config.database}...")
+    #     try:
+    #         url = self._get_url()
+    #         print(f"Connecting to {url}")  # 注意密码不要打印完整，可以只打印 host/port/db
+    #         self.engine = create_async_engine(
+    #             url, pool_size=10, pool_pre_ping=True
+    #         )
+    #         self.session_factory = async_sessionmaker(
+    #             self.engine, autoflush=True, expire_on_commit=False
+    #         )
+    #         print(f"✅ init success for {self.config.database}, session_factory={self.session_factory}")
+    #     except Exception as e:
+    #         print(f"❌ init failed for {self.config.database}: {e}")
+    #         import traceback
+    #         traceback.print_exc()
+    #         raise  # 重新抛出，让应用无法启动（便于发现问题）
 
     async def close(self):
         # 程序结束时释放连接池资源

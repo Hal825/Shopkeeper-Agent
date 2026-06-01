@@ -7,11 +7,10 @@ FastAPI 应用入口
 """
 
 from fastapi import FastAPI
-
+from app.api.lifespan import lifespan  # 确保导入了 lifespan
 from app.api.routers.query_router import query_router
 
-# 创建 FastAPI 应用对象，所有路由、中间件和生命周期事件最终都会注册到这里
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)  # 必须传递 lifespan
 
 # 把查询路由注册进应用；没有挂载时，/docs 和真实 HTTP 请求都访问不到该接口,让app知道有这个东西的存在
 app.include_router(query_router)
