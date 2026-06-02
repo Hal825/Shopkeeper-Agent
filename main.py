@@ -6,11 +6,29 @@ FastAPI 应用入口
 也会从这里逐步接入。
 """
 
-from fastapi import FastAPI
-from app.api.lifespan import lifespan  # 确保导入了 lifespan
+import uuid
+
+from fastapi import FastAPI, Request
+
+from app.api.lifespan import lifespan
 from app.api.routers.query_router import query_router
+from app.core.context import request_id_ctx_var
 
-app = FastAPI(lifespan=lifespan)  # 必须传递 lifespan
+app = FastAPI(lifespan=lifespan)
 
-# 把查询路由注册进应用；没有挂载时，/docs 和真实 HTTP 请求都访问不到该接口,让app知道有这个东西的存在
 app.include_router(query_router)
+
+
+@app.middleware("http")
+async def add_request_id(request: Request, call_next):
+    # 请求被处理之前，先为当前请求生成一个唯一 ID
+    request_id = uuid.uuid4()
+
+    # 写入当前异步上下文，后续业务日志会从这里取 request_id
+    request_id_ctx_var.set(request_id)
+
+    # 继续执行后续路由处理逻辑
+    response = await call_next(request)
+
+    # 请求被处理之后，返回响应
+    return response
