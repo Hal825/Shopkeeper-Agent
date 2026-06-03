@@ -217,6 +217,50 @@ metrics:
     relevant_columns:
       - fact_order.order_amount
     alias: [平均单价, 平均订单金额]
+  # --- 1. 用户类新增指标 ---
+  - name: Repeat Purchase Rate
+    description: 指在特定周期内，发生多次购买行为的消费者占比，直接体现了平台或店铺的用户黏性和忠诚度。
+    relevant_columns:
+      - fact_order.customer_id
+    alias: [ 复购率, 重复购买率, RPR, 用户留存 ]
+
+  - name: Customer Lifetime Value
+    description: 指每个客户在其整个生命周期内能够为平台带来的总价值。在这里简化为总销售额除以总客户数，用于评估客户群体的平均价值。
+    relevant_columns:
+      - fact_order.order_amount
+    alias: [ 客户生命周期价值, 客户总价值, LTV, CLV ]
+
+  - name: Repurchase Frequency
+    description: 指每个购买客户的平均下单次数。
+    relevant_columns:
+      - fact_order.customer_id
+    alias: [ 人均购买频次, 复购频率, RF ]
+
+  # --- 2. 运营类新增指标 ---
+  - name: Total Orders
+    description: 指定时间段内，平台实际成交的订单总数量。
+    relevant_columns:
+      - fact_order.order_id
+    alias: [ 总订单数, 订单量, Order Count ]
+
+  - name: Conversion Rate
+    description: 访客最终完成购买行为的比例，即“订单数”与“访客数”的比率，是衡量流量变现效率的核心指标。
+    relevant_columns:
+      - fact_order.order_id
+    alias: [ 转化率, CVR, 成交转化率 ]
+
+  - name: Average Items Per Order
+    description: 指每一笔订单中平均包含的商品件数，反映了商品组合和交叉销售的效果。
+    relevant_columns:
+      - fact_order.order_quantity
+    alias: [ 连带率, 客件数, AIPO, 笔单价 ]
+
+  # --- 3. 商品类新增指标 ---
+  - name: Per-SKU Sales
+    description: 指特定商品或商品品类所产生的销售额总和，用于识别畅销品与库存规划。
+    relevant_columns:
+      - fact_order.order_amount
+    alias: [ 商品销售额, 单品销售额, 品类销售额, Product Sales, Category Sales ]
 #    这里的 relevant_columns 很重要，因为它把“指标”和“底层字段”连接起来了。后面往元数据库写数据时，column_metric 这张关系表就是根据这个字段来生成的。
 
 #为什么不配置 type 和 examples:能通过程序自动查到的信息，就尽量不要再让用户手工填写。
