@@ -1,60 +1,13 @@
-# import sys
-# from pathlib import Path
-#
-# from loguru import logger
-#
-# from app.conf.app_config import app_config
-# from app.core.context import request_id_ctx_var
-#
-# # 统一日志展示格式，包含时间、级别、请求 ID 和调用位置等关键信息
-# log_format = (
-#     "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
-#     "<level>{level: <8}</level> | "
-#     "<magenta>request_id - {extra[request_id]}</magenta> | "
-#     "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
-#     "<level>{message}</level>"
-# )
-#
-#
-# # 通过 Loguru patch 钩子，把上下文中的 request_id 写入每条日志的 extra 字段
-# def inject_request_id(record):
-#     request_id = request_id_ctx_var.get()
-#     record["extra"]["request_id"] = request_id
-#
-# # 移除 Loguru 默认的输出目标，避免和项目自定义配置重复打印
-# logger.remove()
-#
-# # 生成带 request_id 注入能力的 logger，后续业务代码统一使用这个实例
-# logger = logger.patch(inject_request_id)
-#
-# # 根据配置决定是否输出控制台日志，适合本地开发和容器标准输出采集
-# if app_config.logging.console.enable:
-#     logger.add(
-#         sink=sys.stdout,
-#         level=app_config.logging.console.level,
-#         format=log_format,
-#     )
-#
-# # 根据配置决定是否写入文件日志，并在启动时确保日志目录存在
-#
-# if app_config.logging.file.enable:
-#     path = Path(app_config.logging.file.path)
-#     path.mkdir(parents=True, exist_ok=True)
-#     logger.add(
-#         sink=path / "app.log",
-#         format=log_format,
-#         level=app_config.logging.file.level,
-#         rotation=app_config.logging.file.rotation,
-#         retention=app_config.logging.file.retention,
-#         encoding="utf-8",
-#     )
+import sys
+from pathlib import Path
+
 from loguru import logger
 
 from app.core.context import request_id_ctx_var
 
-# 日志格式统一展示时间、级别、request_id 和调用位置，便于排查链路问题
+# 统一日志格式：时间、级别、request_id、位置、消息
 log_format = (
-    "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
+    "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
     "<level>{level: <8}</level> | "
     "<magenta>request_id - {extra[request_id]}</magenta> | "
     "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
@@ -63,16 +16,36 @@ log_format = (
 
 
 def inject_request_id(record):
-    """把上下文中的 request_id 注入到每条日志的 extra 字段"""
-    # 从当前异步上下文中读取 request_id
-    request_id = request_id_ctx_var.get()
-
-    # extra 是 loguru 预留给自定义字段的位置
-    record["extra"]["request_id"] = request_id
+    """从上下文变量中提取 request_id 注入到日志记录的 extra 字段"""
+    record["extra"]["request_id"] = request_id_ctx_var.get()
 
 
-# 移除 Loguru 默认的输出目标，避免和项目自定义配置重复打印
+# 移除 Loguru 默认的处理器（避免重复输出）
 logger.remove()
 
-# 生成带 request_id 注入能力的 logger，后续业务代码统一使用这个实例
+# 注入 request_id 处理函数
 logger = logger.patch(inject_request_id)
+
+# ===== 1. 控制台输出（便于开发调试） =====
+logger.add(
+    sink=sys.stdout,
+    format=log_format,
+    level="INFO",          # 控制台只显示 INFO 及以上级别
+    colorize=True,         # 终端彩色输出
+)
+
+# ===== 2. 文件输出（持久化存储） =====
+# 定义日志目录和文件路径
+log_dir = Path("logs")
+log_dir.mkdir(parents=True, exist_ok=True)   # 确保目录存在
+log_file = log_dir / "app.log"
+
+logger.add(
+    sink=log_file,
+    format=log_format,
+    level="DEBUG",         # 文件记录 DEBUG 及以上级别（更详细）
+    rotation="10 MB",      # 单个文件超过 10MB 则轮转
+    retention="7 days",    # 保留最近 7 天的日志文件
+    encoding="utf-8",
+    enqueue=True,          # 异步写入，避免阻塞主线程
+)

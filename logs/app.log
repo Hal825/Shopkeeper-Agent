@@ -85,3 +85,60 @@ JOIN dim_region r ON f.region_id = r.region_id
 WHERE r.region_name = '华北';
 2026-06-01 20:17:04.176 | INFO     | request_id - 1 | app.agent.nodes.validate_sql:validate_sql:31 - SQL语法正确
 2026-06-01 20:17:04.178 | INFO     | request_id - 1 | app.agent.nodes.run_sql:run_sql:28 - SQL执行结果：[{'total_sales': 41099.5}]
+2026-06-06 14:26:37.462 | INFO     | request_id - d71e91d1-397a-42bc-9a14-3d3596ee5ab2 | app.agent.nodes.extract_keywords:extract_keywords:50 - 抽取关键词成功: ['排序', '大区', '统计 2025 年第一季度各大区的 GMV，并按 GMV 从高到低排序', '第一季度', 'GMV', '统计']
+2026-06-06 14:26:42.926 | ERROR    | request_id - d71e91d1-397a-42bc-9a14-3d3596ee5ab2 | app.agent.nodes.recall_metric:recall_metric:68 - 召回指标信息 failed: All connection attempts failed
+2026-06-06 14:33:31.706 | INFO     | request_id - 0d0ce064-2ada-4fae-acce-1650a762c3ad | app.agent.nodes.extract_keywords:extract_keywords:50 - 抽取关键词成功: ['大区', '统计 2025 年第一季度各大区的 GMV，并按 GMV 从高到低排序', '排序', '第一季度', 'GMV', '统计']
+2026-06-06 14:33:37.314 | INFO     | request_id - 0d0ce064-2ada-4fae-acce-1650a762c3ad | app.agent.nodes.recall_metric:recall_metric:64 - 检索到指标信息：['GMV', 'Per-SKU Sales', 'Total Orders']
+2026-06-06 14:33:44.018 | INFO     | request_id - 0d0ce064-2ada-4fae-acce-1650a762c3ad | app.agent.nodes.recall_value:recall_value:63 - 检索到字段取值：[]
+2026-06-06 14:33:44.209 | INFO     | request_id - 0d0ce064-2ada-4fae-acce-1650a762c3ad | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:143 - 合并后的表信息：['dim_region', 'dim_date', 'dim_product', 'fact_order']
+2026-06-06 14:33:44.209 | INFO     | request_id - 0d0ce064-2ada-4fae-acce-1650a762c3ad | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:146 - 合并后的指标信息：['GMV', 'Per-SKU Sales', 'Total Orders']
+2026-06-06 14:33:46.595 | INFO     | request_id - 0d0ce064-2ada-4fae-acce-1650a762c3ad | app.agent.nodes.filter_metric:filter_metric:54 - 过滤后的指标信息：['GMV']
+2026-06-06 14:33:51.991 | INFO     | request_id - 0d0ce064-2ada-4fae-acce-1650a762c3ad | app.agent.nodes.filter_table:filter_table:60 - 过滤后的表信息：['dim_region', 'dim_date', 'fact_order']
+2026-06-06 14:33:52.005 | INFO     | request_id - 0d0ce064-2ada-4fae-acce-1650a762c3ad | app.agent.nodes.add_extra_context:add_extra_context:36 - 数据库信息：{'dialect': 'mysql', 'version': '8.0.46'}
+2026-06-06 14:33:52.006 | INFO     | request_id - 0d0ce064-2ada-4fae-acce-1650a762c3ad | app.agent.nodes.add_extra_context:add_extra_context:37 - 日期信息：{'date': '2026-06-06', 'weekday': 'Saturday', 'quarter': 'Q2'}
+2026-06-06 14:33:58.696 | INFO     | request_id - 0d0ce064-2ada-4fae-acce-1650a762c3ad | app.agent.nodes.generate_sql:generate_sql:63 - 生成的SQL：SELECT r.region_name, SUM(f.order_amount) AS GMV
+FROM fact_order f
+JOIN dim_date d ON f.date_id = d.date_id
+JOIN dim_region r ON f.region_id = r.region_id
+WHERE d.year = 2025 AND d.quarter = 'Q1'
+GROUP BY r.region_name
+ORDER BY GMV DESC
+2026-06-06 14:33:58.721 | INFO     | request_id - 0d0ce064-2ada-4fae-acce-1650a762c3ad | app.agent.nodes.validate_sql:validate_sql:34 - SQL语法正确
+2026-06-06 14:33:58.727 | INFO     | request_id - 0d0ce064-2ada-4fae-acce-1650a762c3ad | app.agent.nodes.run_sql:run_sql:29 - SQL执行结果：[{'region_name': '华东', 'GMV': 107373.0}, {'region_name': '华南', 'GMV': 70202.0}, {'region_name': '华北', 'GMV': 41099.5}, {'region_name': '西南', 'GMV': 31528.0}, {'region_name': '华中', 'GMV': 28957.0}]
+2026-06-06 14:37:58 | INFO     | request_id - a6dfec1a-4a2b-4ea1-b451-a58c98630a78 | app.agent.nodes.extract_keywords:extract_keywords:50 - 抽取关键词成功: ['统计 2025 年 3 月各商品品类的销量和销售额', '销售额', '统计', '商品', '品类', '销量']
+2026-06-06 14:38:02 | INFO     | request_id - a6dfec1a-4a2b-4ea1-b451-a58c98630a78 | app.agent.nodes.recall_metric:recall_metric:64 - 检索到指标信息：['Per-SKU Sales', 'GMV']
+2026-06-06 14:38:04 | INFO     | request_id - a6dfec1a-4a2b-4ea1-b451-a58c98630a78 | app.agent.nodes.recall_value:recall_value:63 - 检索到字段取值：['dim_product.brand.3M', 'dim_date.quarter.Q3', 'dim_product.product_name.华为FreeBuds Pro 3', 'dim_product.product_name.3M汽车贴膜']
+2026-06-06 14:38:04 | INFO     | request_id - a6dfec1a-4a2b-4ea1-b451-a58c98630a78 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:143 - 合并后的表信息：['fact_order', 'dim_product', 'dim_date']
+2026-06-06 14:38:04 | INFO     | request_id - a6dfec1a-4a2b-4ea1-b451-a58c98630a78 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:146 - 合并后的指标信息：['Per-SKU Sales', 'GMV']
+2026-06-06 14:38:10 | INFO     | request_id - a6dfec1a-4a2b-4ea1-b451-a58c98630a78 | app.agent.nodes.filter_metric:filter_metric:54 - 过滤后的指标信息：['Per-SKU Sales']
+2026-06-06 14:38:17 | INFO     | request_id - a6dfec1a-4a2b-4ea1-b451-a58c98630a78 | app.agent.nodes.filter_table:filter_table:60 - 过滤后的表信息：['fact_order', 'dim_product']
+2026-06-06 14:38:17 | INFO     | request_id - a6dfec1a-4a2b-4ea1-b451-a58c98630a78 | app.agent.nodes.add_extra_context:add_extra_context:36 - 数据库信息：{'dialect': 'mysql', 'version': '8.0.46'}
+2026-06-06 14:38:17 | INFO     | request_id - a6dfec1a-4a2b-4ea1-b451-a58c98630a78 | app.agent.nodes.add_extra_context:add_extra_context:37 - 日期信息：{'date': '2026-06-06', 'weekday': 'Saturday', 'quarter': 'Q2'}
+2026-06-06 14:38:21 | INFO     | request_id - a6dfec1a-4a2b-4ea1-b451-a58c98630a78 | app.agent.nodes.generate_sql:generate_sql:63 - 生成的SQL：SELECT d.category AS 商品品类, SUM(f.order_quantity) AS 销量, SUM(f.order_amount) AS 销售额
+FROM fact_order f
+JOIN dim_product d ON f.product_id = d.product_id
+WHERE f.date_id BETWEEN 20250301 AND 20250331
+GROUP BY d.category;
+2026-06-06 14:38:21 | INFO     | request_id - a6dfec1a-4a2b-4ea1-b451-a58c98630a78 | app.agent.nodes.validate_sql:validate_sql:34 - SQL语法正确
+2026-06-06 14:38:21 | INFO     | request_id - a6dfec1a-4a2b-4ea1-b451-a58c98630a78 | app.agent.nodes.run_sql:run_sql:29 - SQL执行结果：[{'商品品类': '手机数码', '销量': Decimal('10'), '销售额': 62190.0}, {'商品品类': '食品饮料', '销量': Decimal('139'), '销售额': 1115.0}, {'商品品类': '休闲零食', '销量': Decimal('156'), '销售额': 630.0}, {'商品品类': '鞋靴', '销量': Decimal('4'), '销售额': 4396.0}, {'商品品类': '服饰', '销量': Decimal('7'), '销售额': 2593.0}, {'商品品类': '家用电器', '销量': Decimal('6'), '销售额': 19196.0}]
+2026-06-06 15:16:36 | INFO     | request_id - 9c077b3a-81d0-4118-a671-5001f3340a72 | app.agent.nodes.extract_keywords:extract_keywords:50 - 抽取关键词成功: ['品类', '统计', '统计 2025 年 3 月各商品品类的销量和销售额', '销量', '销售额', '商品']
+2026-06-06 15:16:39 | INFO     | request_id - 9c077b3a-81d0-4118-a671-5001f3340a72 | app.agent.nodes.recall_metric:recall_metric:64 - 检索到指标信息：['GMV', 'Per-SKU Sales']
+2026-06-06 15:16:48 | INFO     | request_id - 9c077b3a-81d0-4118-a671-5001f3340a72 | app.agent.nodes.recall_value:recall_value:63 - 检索到字段取值：['dim_product.brand.3M', 'dim_date.quarter.Q3', 'dim_product.product_name.华为FreeBuds Pro 3', 'dim_product.product_name.3M汽车贴膜']
+2026-06-06 15:31:26 | INFO     | request_id - efa5f086-43f3-4f0d-b9f8-93f802220c86 | app.agent.nodes.extract_keywords:extract_keywords:50 - 抽取关键词成功: ['统计', 'GMV', '统计 2025 年第一季度各大区的 GMV，并按 GMV 从高到低排序', '第一季度', '排序', '大区']
+2026-06-06 15:31:30 | INFO     | request_id - efa5f086-43f3-4f0d-b9f8-93f802220c86 | app.agent.nodes.recall_metric:recall_metric:64 - 检索到指标信息：['GMV', 'Per-SKU Sales']
+2026-06-06 15:31:39 | INFO     | request_id - efa5f086-43f3-4f0d-b9f8-93f802220c86 | app.agent.nodes.recall_value:recall_value:63 - 检索到字段取值：[]
+2026-06-06 15:31:39 | INFO     | request_id - efa5f086-43f3-4f0d-b9f8-93f802220c86 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:143 - 合并后的表信息：['fact_order', 'dim_date', 'dim_region', 'dim_product']
+2026-06-06 15:31:39 | INFO     | request_id - efa5f086-43f3-4f0d-b9f8-93f802220c86 | app.agent.nodes.merge_retrieved_info:merge_retrieved_info:146 - 合并后的指标信息：['GMV', 'Per-SKU Sales']
+2026-06-06 15:31:41 | INFO     | request_id - efa5f086-43f3-4f0d-b9f8-93f802220c86 | app.agent.nodes.filter_metric:filter_metric:54 - 过滤后的指标信息：['GMV']
+2026-06-06 15:31:48 | INFO     | request_id - efa5f086-43f3-4f0d-b9f8-93f802220c86 | app.agent.nodes.filter_table:filter_table:60 - 过滤后的表信息：['fact_order', 'dim_date', 'dim_region']
+2026-06-06 15:31:48 | INFO     | request_id - efa5f086-43f3-4f0d-b9f8-93f802220c86 | app.agent.nodes.add_extra_context:add_extra_context:36 - 数据库信息：{'dialect': 'mysql', 'version': '8.0.46'}
+2026-06-06 15:31:48 | INFO     | request_id - efa5f086-43f3-4f0d-b9f8-93f802220c86 | app.agent.nodes.add_extra_context:add_extra_context:37 - 日期信息：{'date': '2026-06-06', 'weekday': 'Saturday', 'quarter': 'Q2'}
+2026-06-06 15:31:57 | INFO     | request_id - efa5f086-43f3-4f0d-b9f8-93f802220c86 | app.agent.nodes.generate_sql:generate_sql:63 - 生成的SQL：SELECT r.region_name AS 大区, SUM(f.order_amount) AS GMV
+FROM fact_order f
+JOIN dim_date d ON f.date_id = d.date_id
+JOIN dim_region r ON f.region_id = r.region_id
+WHERE d.year = 2025 AND d.quarter = 'Q1'
+GROUP BY r.region_name
+ORDER BY GMV DESC
+2026-06-06 15:31:57 | INFO     | request_id - efa5f086-43f3-4f0d-b9f8-93f802220c86 | app.agent.nodes.validate_sql:validate_sql:34 - SQL语法正确
+2026-06-06 15:31:57 | INFO     | request_id - efa5f086-43f3-4f0d-b9f8-93f802220c86 | app.agent.nodes.run_sql:run_sql:29 - SQL执行结果：[{'大区': '华东', 'GMV': 107373.0}, {'大区': '华南', 'GMV': 70202.0}, {'大区': '华北', 'GMV': 41099.5}, {'大区': '西南', 'GMV': 31528.0}, {'大区': '华中', 'GMV': 28957.0}]

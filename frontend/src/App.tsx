@@ -18,6 +18,7 @@ import { MessageBubble } from "./components/MessageBubble";
 import { streamQuery } from "./lib/agentApi";
 import { cn, summarizeResult } from "./lib/format";
 import type { AgentEvent, ChatMessage, StepState } from "./types/agent";
+import ManualPage from "./components/ManualPage";
 
 const examples = [
   "统计 2025 年第一季度各大区的 GMV，并按 GMV 从高到低排序",
@@ -46,7 +47,17 @@ export default function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [activeController, setActiveController] = useState<AbortController | null>(null);
+  const [showManual, setShowManual] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  // 首次访问自动显示手册
+  useEffect(() => {
+    const hasVisited = localStorage.getItem("hasVisitedManual");
+    if (!hasVisited) {
+      setShowManual(true);
+      localStorage.setItem("hasVisitedManual", "true");
+    }
+  }, []);
 
   const isStreaming = Boolean(activeController);
   const canSubmit = draft.trim().length > 0 && !isStreaming;
@@ -159,6 +170,12 @@ export default function App() {
     setDraft("");
   };
 
+  // 如果显示手册页面，直接渲染手册组件（全屏，无聊天界面）
+  if (showManual) {
+    return <ManualPage onClose={() => setShowManual(false)} />;
+  }
+
+  // 正常聊天界面
   return (
     <div className="h-dvh overflow-hidden bg-parchment text-ink">
       <div className="pointer-events-none fixed inset-0 bg-[linear-gradient(90deg,rgba(32,32,29,0.045)_1px,transparent_1px),linear-gradient(rgba(32,32,29,0.035)_1px,transparent_1px)] bg-[size:48px_48px]" />
@@ -241,18 +258,30 @@ export default function App() {
                 <div className="truncate text-xs text-ink/45">FastAPI SSE / LangGraph</div>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={clearConversation}
-              disabled={messages.length === 0 || isStreaming}
-              className={cn(
-                "grid h-9 w-9 place-items-center rounded-full text-ink/55 transition hover:bg-ink/5 hover:text-ink disabled:cursor-not-allowed disabled:opacity-35",
-              )}
-              title="清空"
-              aria-label="清空"
-            >
-              <Eraser className="h-4 w-4" aria-hidden="true" />
-            </button>
+            <div className="flex items-center gap-2">
+              {/* 操作手册按钮（橡皮擦左边） */}
+              <button
+                onClick={() => setShowManual(true)}
+                className="grid h-9 w-9 place-items-center rounded-full text-ink/55 transition hover:bg-ink/5 hover:text-ink"
+                title="操作手册"
+                aria-label="操作手册"
+              >
+                📘
+              </button>
+              {/* 清空按钮（橡皮擦） */}
+              <button
+                type="button"
+                onClick={clearConversation}
+                disabled={messages.length === 0 || isStreaming}
+                className={cn(
+                  "grid h-9 w-9 place-items-center rounded-full text-ink/55 transition hover:bg-ink/5 hover:text-ink disabled:cursor-not-allowed disabled:opacity-35",
+                )}
+                title="清空"
+                aria-label="清空"
+              >
+                <Eraser className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
           </header>
 
           <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
