@@ -103,6 +103,7 @@ class MetaKnowledgeService:
         points: list[dict] = []
         for col in column_infos:
             # 拆成多条语义入口：字段名、描述、别名各为一个点
+            # 因为这三个字段是用户自然语言问题中最可能直接提到的内容，而其他字段不适合做语义检索：
             points.append({
                 "id": str(uuid.uuid4()),
                 "embedding_text": col.name,
@@ -215,10 +216,6 @@ class MetaKnowledgeService:
 
     # ========== 指标向量索引 ==========
     async def _save_metrics_to_qdrant(self, metric_infos: list[MetricInfo]):
-        if not self.metric_qdrant_repository:
-            logger.info("MetricQdrantRepository 未配置，跳过指标向量索引")
-            return
-
         await self.metric_qdrant_repository.ensure_collection()
 
         points = []
@@ -254,6 +251,7 @@ class MetaKnowledgeService:
 
     # ========== 总控构建 ==========
     async def build(self, config_path: Path):
+        # config_path:.yaml,MetaConfig:.py
         context = OmegaConf.load(config_path)
         schema = OmegaConf.structured(MetaConfig)
         meta_config: MetaConfig = OmegaConf.to_object(OmegaConf.merge(schema, context))

@@ -26,7 +26,7 @@ class DWMySQLRepository:
         result_dict = result.mappings().fetchall()
         return {row["Field"]: row["Type"] for row in result_dict}
 
-    async def get_column_values(self, table_name: str, column_name: str, limit: int = 1000) -> list:
+    async def get_column_values(self, table_name: str, column_name: str, limit: int = 10) -> list:
         sql = f"select distinct {column_name} from {table_name} limit {limit}"
         # print(f"[DEBUG] 数据库连接: {self.session.bind.url}")
         # print(f"[DEBUG] 执行SQL: {sql}")
