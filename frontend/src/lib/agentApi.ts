@@ -11,14 +11,31 @@ type QueryOptions = {
   onEvent: (event: AgentEvent) => void;
 };
 
+// 获取当前会话的 thread_id（存储在 sessionStorage 中）
+function getThreadId(): string {
+  let threadId = sessionStorage.getItem("agent_thread_id");
+  if (!threadId) {
+    threadId = crypto.randomUUID();
+    sessionStorage.setItem("agent_thread_id", threadId);
+  }
+  return threadId;
+}
+
+// 重置会话（新对话时调用）
+export function resetThreadId(): void {
+  sessionStorage.removeItem("agent_thread_id");
+}
+
 export async function streamQuery(query: string, options: QueryOptions) {
+  const threadId = getThreadId();
+
   const response = await fetch(`${API_BASE_URL}/api/query`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "text/event-stream",
     },
-    body: JSON.stringify({ query }),
+    body: JSON.stringify({ query, thread_id: threadId }),
     signal: options.signal,
   });
 
@@ -50,6 +67,7 @@ export async function streamQuery(query: string, options: QueryOptions) {
     }
   }
 
+  // 处理剩余未闭合的数据块
   buffer += decoder.decode();
   const tail = parseSseChunk(buffer);
   if (tail) {

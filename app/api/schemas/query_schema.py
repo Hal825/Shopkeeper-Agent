@@ -13,3 +13,4 @@ class QuerySchema(BaseModel):
 
     # 前端请求体中的 query 字段，例如 {"query": "统计华北地区销售额"}
     query: str
+    thread_id: str  # 新增，前端需传递唯一会话ID（如 UUID 或用户ID+时间戳）

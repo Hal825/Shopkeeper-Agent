@@ -1,5 +1,6 @@
 import json
 
+
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
 
 from app.agent.context import DataAgentContext
@@ -32,11 +33,11 @@ class QueryService:
         self.metric_qdrant_repository = metric_qdrant_repository
         self.value_es_repository = value_es_repository
 
-    async def query(self, query: str):
+    async def query(self, query: str,thread_id:str):
         # state：任务数据，图执行过程中会变
         # context：工具资源，节点执行时拿来用
         # State 只放会被图节点读写和合并的业务数据，外部工具对象不塞进 State
-        state = DataAgentState(query=query)
+        state = DataAgentState(query=query,messages=[]) # 初始化 messages
 
         # Context 保存本次图执行需要复用的外部依赖，节点通过 runtime.context 读取
         context = DataAgentContext(
@@ -50,9 +51,11 @@ class QueryService:
 
         try:
             # stream_mode="custom" 对应节点内部 writer(...) 写出的进度消息
+            config = {"configurable": {"thread_id": thread_id}}
             async for chunk in graph.astream(
                 input=state,
                 context=context,
+                config=config,
                 stream_mode="custom",
             # stream_mode="values"：每执行一个节点，就 yield 当前完整的 state（所有数据快照）。
             # stream_mode="updates"：每执行一个节点，就 yield 该节点对 state 的修改部分。

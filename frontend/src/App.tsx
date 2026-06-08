@@ -105,29 +105,35 @@ export default function App() {
         current.map((message) => {
           if (message.id !== assistantId) return message;
 
-          if (event.type === "progress") {
-            return {
-              ...message,
-              content: event.status === "running" ? `正在执行：${event.step}` : message.content,
-              steps: upsertStep(message.steps, event),
-            };
+          switch (event.type) {
+            case "progress":
+              return {
+                ...message,
+                content: event.status === "running" ? `正在执行：${event.step}` : message.content,
+                steps: upsertStep(message.steps, event),
+              };
+            case "result":
+              return {
+                ...message,
+                status: "done",
+                content: summarizeResult(event.data),
+                result: event.data,
+              };
+            case "explanation":   // 新增
+              return {
+                ...message,
+                explanation: event.text,     // 存储解释文本
+                // 可选：如果希望把解释也作为主要内容显示，可以更新 content
+                // content: event.text,
+              };
+            default:
+              return {
+                ...message,
+                status: "error",
+                content: "这次查询没有成功。",
+                error: (event as any).message || "未知错误",
+              };
           }
-
-          if (event.type === "result") {
-            return {
-              ...message,
-              status: "done",
-              content: summarizeResult(event.data),
-              result: event.data,
-            };
-          }
-
-          return {
-            ...message,
-            status: "error",
-            content: "这次查询没有成功。",
-            error: event.message,
-          };
         }),
       );
     };

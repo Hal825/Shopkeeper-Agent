@@ -38,6 +38,6 @@ async def query_handler(
 
     return StreamingResponse(
         # query.query 是用户问题字符串；QueryService.query 返回异步生成器供响应逐段消费
-        query_service.query(query.query),
+        query_service.query(query.query,query.thread_id),
         media_type="text/event-stream",
     )

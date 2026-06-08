@@ -22,7 +22,8 @@ async def extract_keywords(state: DataAgentState, runtime: Runtime[DataAgentCont
 
     try:
         query = state["query"]
-
+        messages = state.get("messages", [])
+        messages.append({"role":"user","content":query})
         # 只保留更可能承载业务含义的词性，减少“的、帮我、一下”这类无检索价值的噪声
         allow_pos = (
             "n",  # 名词: 商品、订单、销售额
@@ -48,7 +49,7 @@ async def extract_keywords(state: DataAgentState, runtime: Runtime[DataAgentCont
 
         writer({"type": "progress", "step": step, "status": "success"})
         logger.info(f"抽取关键词成功: {keywords}")
-        return {"keywords": keywords}
+        return {"keywords": keywords,"messages": messages}
     except Exception as e:
         logger.error(f"抽取关键词失败: {e}")
         writer({"type": "progress", "step": step, "status": "error"})

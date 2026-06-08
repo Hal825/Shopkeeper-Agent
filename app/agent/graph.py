@@ -40,6 +40,7 @@ from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
 from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantRepository
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
+from langgraph.checkpoint.memory import InMemorySaver
 
 # StateGraph 声明整张图使用的状态结构和运行时上下文结构
 graph_builder = StateGraph(state_schema=DataAgentState, context_schema=DataAgentContext)
@@ -120,7 +121,8 @@ graph_builder.add_edge("explain_result", END)
 
 
 # 编译后的 graph 是对外使用的 Agent 执行入口
-graph = graph_builder.compile()
+checkpointer = InMemorySaver()
+graph = graph_builder.compile(checkpointer=checkpointer)
 
 # print(graph.get_graph().draw_mermaid())
 

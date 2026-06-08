@@ -41,7 +41,9 @@ async def explain_result(state: DataAgentState, runtime: Runtime[DataAgentContex
         "result": result_yaml,
         "metric_infos": yaml.dump(metric_infos, allow_unicode=True, sort_keys=False),
     })
-
     logger.info(f"解释结果：{explanation}")
     writer({"type": "explanation", "text": explanation})
-    return {}
+
+    messages = state.get("messsages", [])
+    messages.append({"role": "assistant", "content": explanation})
+    return {"messages":messages}

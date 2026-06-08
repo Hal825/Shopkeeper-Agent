@@ -20,7 +20,12 @@ export type ErrorEvent = {
   message: string;
 };
 
-export type AgentEvent = ProgressEvent | ResultEvent | ErrorEvent;
+export type ExplanationEvent = {
+  type: "explanation";
+  text: string;
+};
+
+export type AgentEvent = ProgressEvent | ResultEvent | ErrorEvent | ExplanationEvent;
 
 export type StepState = {
   step: string;
@@ -36,5 +41,6 @@ export type ChatMessage = {
   status?: "streaming" | "done" | "error";
   steps?: StepState[];
   result?: unknown;
+  explanation?: string;     // 助手消息的解释文本
   error?: string;
 };

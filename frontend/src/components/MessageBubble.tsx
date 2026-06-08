@@ -55,6 +55,11 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
           )}
 
           {!isUser && <StepRail steps={message.steps} />}
+          {!isUser && message.explanation && (
+            <div className="mt-3 rounded-md bg-blue-50 p-3 text-sm text-blue-800 border-l-4 border-blue-500">
+              💡 {message.explanation}
+            </div>
+          )}
           {!isUser && message.result !== undefined && <ResultTable data={message.result} />}
 
           <div
