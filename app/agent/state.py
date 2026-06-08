@@ -79,3 +79,6 @@ class DataAgentState(TypedDict):
 
     error: str  # 校验SQL时出现的错误信息
     # 写入:validate_sql,读取:graph 条件分支、correct_sql.作用:保存 SQL 校验错误
+    result: list[dict]  # 新增：SQL 执行结果
+
+    retry_count: int  # 当前已重试次数

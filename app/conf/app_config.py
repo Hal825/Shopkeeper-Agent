@@ -58,6 +58,10 @@ class LLMConfig:
     base_url: str
 
 @dataclass
+class SQLConfig:
+    max_retries: int
+
+@dataclass
 class AppConfig:
     logging: LoggingConfig
     db_meta: DBConfig
@@ -66,7 +70,7 @@ class AppConfig:
     embedding: EmbeddingConfig
     es: ESConfig
     llm: LLMConfig
-
+    sql: SQLConfig  # 新增
 
 # ====================== 配置加载（修改部分） ======================
 # 修改：配置文件在项目根目录的 conf 文件夹下

@@ -42,3 +42,6 @@ llm:
   model_name: deepseek-v4-pro
   api_key: ${DEEPSEEK_API_KEY}
   base_url: https://api.deepseek.com
+
+sql:
+  max_retries: 2   # SQL 校验失败后的最大重试次数

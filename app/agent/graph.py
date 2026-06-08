@@ -15,7 +15,9 @@ from langgraph.graph import StateGraph
 from app.agent.context import DataAgentContext
 from app.agent.nodes.add_extra_context import add_extra_context
 from app.agent.nodes.correct_sql import correct_sql
+from app.agent.nodes.explain_result import explain_result
 from app.agent.nodes.extract_keywords import extract_keywords
+from app.agent.nodes.fail import fail
 from app.agent.nodes.filter_metric import filter_metric
 from app.agent.nodes.filter_table import filter_table
 from app.agent.nodes.generate_sql import generate_sql
@@ -32,6 +34,7 @@ from app.clients.mysql_client_manager import (
     meta_mysql_client_manager, dw_mysql_client_manager,
 )
 from app.clients.qdrant_client_manager import qdrant_client_manager
+from app.conf.app_config import app_config
 from app.repositories.es.value_es_repository import ValueESRepository
 from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
@@ -54,6 +57,9 @@ graph_builder.add_node("generate_sql", generate_sql)
 graph_builder.add_node("validate_sql", validate_sql)
 graph_builder.add_node("correct_sql", correct_sql)
 graph_builder.add_node("run_sql", run_sql)
+graph_builder.add_node("explain_result", explain_result)
+graph_builder.add_node("fail", fail)
+
 
 # 从用户问题开始，先抽取关键词作为后续检索的基础
 # 定义边（执行顺序）
@@ -79,18 +85,37 @@ graph_builder.add_edge("filter_metric", "add_extra_context")
 graph_builder.add_edge("add_extra_context", "generate_sql")
 graph_builder.add_edge("generate_sql", "validate_sql")
 
+
+def route_after_validate(state: DataAgentState):
+    if state.get("error") is None:
+        return "run_sql"
+    return "correct_sql"
+
+def route_after_correct(state: DataAgentState):
+    max_retries = app_config.sql.max_retries
+    retry_count = state.get("retry_count",0)
+    if retry_count < max_retries:
+        return "validate_sql"
+    else:
+        return "fail"
 # SQL 校验通过就直接执行，校验失败则先进入修正节点
 graph_builder.add_conditional_edges(
     source="validate_sql",
-    path=lambda state: "run_sql" if state["error"] is None else "correct_sql",
+    path=route_after_validate,
     path_map={"run_sql": "run_sql", "correct_sql": "correct_sql"},
+)
+
+graph_builder.add_conditional_edges(
+    source="correct_sql",
+    path=route_after_correct,
+    path_map={"validate_sql": "validate_sql", "fail": "fail"},
 )
 
 # 在生产级系统里，通常会扩展成带次数限制的循环：
 # 生成 SQL -> 校验 -> 校正 -> 再校验 -> 最多重试 N 次 -> 执行或返回失败
 # 从 correct_sql 节点到 run_sql 节点的边，只有当流程经过 correct_sql 节点时才会用到这条边。
-graph_builder.add_edge("correct_sql", "run_sql")
-graph_builder.add_edge("run_sql", END)
+graph_builder.add_edge("run_sql", "explain_result")
+graph_builder.add_edge("explain_result", END)
 
 
 
