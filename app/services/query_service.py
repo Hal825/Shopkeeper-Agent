@@ -37,7 +37,22 @@ class QueryService:
         # state：任务数据，图执行过程中会变
         # context：工具资源，节点执行时拿来用
         # State 只放会被图节点读写和合并的业务数据，外部工具对象不塞进 State
-        state = DataAgentState(query=query,messages=[]) # 初始化 messages
+        state = DataAgentState(
+            query=query,
+            keywords=[],
+            retrieved_column_infos=[],
+            retrieved_metric_infos=[],
+            retrieved_value_infos=[],
+            table_infos=[],
+            metric_infos=[],
+            error="",
+            sql="",
+            retry_count=0,
+            # messages=[],  # 关键
+            intent="",
+            intent_reply=""
+            # 其他字段根据需要
+        )
 
         # Context 保存本次图执行需要复用的外部依赖，节点通过 runtime.context 读取
         context = DataAgentContext(

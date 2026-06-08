@@ -115,6 +115,10 @@ function FlowNodeCard({ node, status }: { node: FlowNode; status: FlowStatus }) 
 }
 
 export function StepRail({ steps = [] }: { steps?: StepState[] }) {
+  // 仅当 steps 中包含“抽取关键词”时才显示流程图（表示这是一个真正的查询流程）
+  const hasQueryStep = steps.some(step => step.step === "抽取关键词");
+  if (!hasQueryStep) return null;
+
   if (steps.length === 0) return null;
 
   const statusMap = getStatusMap(steps);

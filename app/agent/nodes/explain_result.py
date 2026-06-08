@@ -43,7 +43,9 @@ async def explain_result(state: DataAgentState, runtime: Runtime[DataAgentContex
     })
     logger.info(f"解释结果：{explanation}")
     writer({"type": "explanation", "text": explanation})
+    writer({"type": "progress", "step": "生成结果解释", "status": "success"})
 
-    messages = state.get("messsages", [])
+    # 保存助手消息到历史
+    messages = state.get("messages", [])
     messages.append({"role": "assistant", "content": explanation})
     return {"messages":messages}

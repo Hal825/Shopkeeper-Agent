@@ -122,6 +122,7 @@ export default function App() {
             case "explanation":   // 新增
               return {
                 ...message,
+                status: "done",
                 explanation: event.text,     // 存储解释文本
                 // 可选：如果希望把解释也作为主要内容显示，可以更新 content
                 // content: event.text,
@@ -140,13 +141,6 @@ export default function App() {
 
     try {
       await streamQuery(query, { signal: controller.signal, onEvent });
-      setMessages((current) =>
-        current.map((message) =>
-          message.id === assistantId && message.status === "streaming"
-            ? { ...message, status: "done", content: "流程已结束，后端未返回查询结果。" }
-            : message,
-        ),
-      );
     } catch (error) {
       const isAbort = error instanceof DOMException && error.name === "AbortError";
       setMessages((current) =>

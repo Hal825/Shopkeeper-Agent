@@ -82,3 +82,5 @@ class DataAgentState(TypedDict):
     retry_count: int  # 当前已重试次数
     messages: List[Dict[str,Any]]
     # 对话历史，格式 [{"role": "user", "content": "..."}, {"role": "assistant", "content": "解释或结果"}]
+    intent: str          # 意图分类结果
+    intent_reply: str    # 意图节点生成的回复（仅用于非查询意图）
