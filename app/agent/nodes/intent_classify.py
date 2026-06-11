@@ -21,7 +21,7 @@ async def intent_classify(state: DataAgentState, runtime: Runtime[DataAgentConte
         for msg in reversed(messages):
             if msg.get("role") == "assistant":
                 last_assistant_msgs.append(msg.get("content", ""))
-                if len(last_assistant_msgs) >= 5:
+                if len(last_assistant_msgs) > 5:
                     break
         last_assistant_msg = "\n".join(last_assistant_msgs)  # 如果列表为空，得到空字符串
 
@@ -39,6 +39,9 @@ async def intent_classify(state: DataAgentState, runtime: Runtime[DataAgentConte
 
         intent = result.get("intent", "data_query")
         reply = result.get("reply", "")
+        # 为闲聊意图提供默认回复，避免空字符串
+        if intent == "chitchat" and not reply:
+            reply = "我是电商问数助手，专注于数据查询和分析。您可以问我类似“统计华北地区的销售总额”的问题。"
 
         logger.info(f"意图分类结果：{intent}")
         writer({"type": "progress", "step": "理解用户意图", "status": "success"})

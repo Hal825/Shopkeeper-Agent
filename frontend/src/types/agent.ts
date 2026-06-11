@@ -27,6 +27,7 @@ export type ExplanationEvent = {
 
 export type AgentEvent = ProgressEvent | ResultEvent | ErrorEvent | ExplanationEvent;
 
+
 export type StepState = {
   step: string;
   status: ProgressStatus;

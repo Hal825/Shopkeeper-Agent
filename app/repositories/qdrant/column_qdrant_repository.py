@@ -54,7 +54,7 @@ class ColumnQdrantRepository:
             )
 
     async def search(
-        self, embedding: list[float], score_threshold: float = 0.5, limit: int = 20
+        self, embedding: list[float], score_threshold: float = 0.3, limit: int = 20
     ) -> list[ColumnInfo]:
         """按向量相似度检索字段元数据，并还原为 ColumnInfo 实体"""
         result = await self.client.query_points(

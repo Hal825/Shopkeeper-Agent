@@ -103,12 +103,15 @@ graph_builder.add_edge("recap_answer", END)
 graph_builder.add_edge("chitchat_answer", END)
 graph_builder.add_edge("help_answer", END)
 
-graph_builder.add_edge("extract_keywords", "start_recall")
-
-# start_recall 并行分发到三路召回
-graph_builder.add_edge("start_recall", "recall_column")
-graph_builder.add_edge("start_recall", "recall_value")
-graph_builder.add_edge("start_recall", "recall_metric")
+# graph_builder.add_edge("extract_keywords", "start_recall")
+#
+# # start_recall 并行分发到三路召回
+# graph_builder.add_edge("start_recall", "recall_column")
+# graph_builder.add_edge("start_recall", "recall_value")
+# graph_builder.add_edge("start_recall", "recall_metric")
+graph_builder.add_edge("extract_keywords", "recall_column")
+graph_builder.add_edge("extract_keywords", "recall_value")
+graph_builder.add_edge("extract_keywords", "recall_metric")
 
 # 三路召回都完成后，再进入统一的信息合并节点
 graph_builder.add_edge("recall_column", "merge_retrieved_info")

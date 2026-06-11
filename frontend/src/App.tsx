@@ -124,6 +124,7 @@ export default function App() {
                 ...message,
                 status: "done",
                 explanation: event.text,     // 存储解释文本
+                // content: event.text,
                 // 可选：如果希望把解释也作为主要内容显示，可以更新 content
                 // content: event.text,
               };
@@ -132,7 +133,7 @@ export default function App() {
                 ...message,
                 status: "error",
                 content: "这次查询没有成功。",
-                error: (event as any).message || "未知错误",
+                error: (event as any).message,
               };
           }
         }),

@@ -47,16 +47,31 @@ async def filter_table(state: DataAgentState, runtime: Runtime[DataAgentContext]
             }
         )
         # 模型只负责选择，程序根据选择结果从原始 TableInfoState 中裁剪，避免模型重写复杂结构出错
+        # filtered_table_infos: list[TableInfoState] = []
+        # for table_info in table_infos:
+        #     if table_info["name"] in result:
+        #         table_info["columns"] = [
+        #             column_info
+        #             for column_info in table_info["columns"]
+        #             if column_info["name"] in result[table_info["name"]]
+        #         ]
+        #         filtered_table_infos.append(table_info)
         filtered_table_infos: list[TableInfoState] = []
         for table_info in table_infos:
-            if table_info["name"] in result:
-                table_info["columns"] = [
-                    column_info
-                    for column_info in table_info["columns"]
-                    if column_info["name"] in result[table_info["name"]]
-                ]
-                filtered_table_infos.append(table_info)
-
+            if table_info["name"] not in result:
+                continue
+            needed_columns = result[table_info["name"]]
+            kept_columns = [
+                column_info
+                for column_info in table_info["columns"]
+                if column_info["name"] in needed_columns
+            ]
+            if not kept_columns:
+                continue
+            # 浅拷贝保留其他元数据（如 comment, database 等）
+            filtered_table_info = dict(table_info)
+            filtered_table_info["columns"] = kept_columns
+            filtered_table_infos.append(filtered_table_info)
         logger.info(
             f"过滤后的表信息：{[filtered_table_info['name'] for filtered_table_info in filtered_table_infos]}"
         )
